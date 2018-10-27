@@ -1,8 +1,10 @@
+[![Build Status](https://travis-ci.com/FloChehab/Game-of-news.svg?token=hZTHeNJUJ6Vdp9ym43T9&branch=master)](https://travis-ci.com/FloChehab/Game-of-news)
+
 Game of news
 ===========
 
 ## Requirements
-You only need <b>node.js</b> pre-installed and you’re good to go. 
+You only need <b>node.js</b> pre-installed and you’re good to go.
 
 If you don’t want to work with lodash, just remove it from the node packages and the webpack config.
 
