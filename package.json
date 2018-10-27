@@ -4,7 +4,7 @@
   "description": "TODO",
   "author": "TODO",
   "license": "BSD2",
-  "homepage": "https://github.com/FloChehab/Game-of-news",
+  "homepage": "https://flochehab.github.io/Game-of-news/",
   "scripts": {
     "dev": "cross-env NODE_ENV=dev webpack-dev-server --progress --mode development --config webpack.config.dev.js",
     "build": "webpack -p --progress --mode production --config webpack.config.build.js"
