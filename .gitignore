@@ -8,6 +8,8 @@ log/
 dist/
 node_modules/
 bower_components/
+*/tmp/
+*/.ipynb_checkpoints/
 
 ## Files
 result.xml
