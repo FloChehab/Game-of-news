@@ -1,6 +1,13 @@
 import strDateTimeFromDate from "./utils/strDateTimeFromDate";
 import CONFIG from "../config.js";
+import eventsSchema from "./schemas/eventsSchema";
+import mentionsSchema from "./schemas/mentionsSchema";
+import { filterCompiledSchema } from "./schemas/utils";
+
 import JSZip from "jszip";
+
+const filteredMentionsSchema = filterCompiledSchema(mentionsSchema, CONFIG.MENTIONS_CSV_FILTER);
+const filteredEventsSchema = filterCompiledSchema(eventsSchema, CONFIG.EVENTS_CSV_FILTER);
 
 async function unzipBlob(blob) {
   try {
@@ -24,23 +31,29 @@ async function fetchZip(url) {
   }
 }
 
-function parseRow(row) {
+function parseRow(row, rowSchema) {
   let res = {};
-  const mentionsSchema = CONFIG.MENTIONS_CSV_SCHEMA;
-  for (const key in mentionsSchema) {
-    const keyConfig = mentionsSchema[key];
-    const strVal = row[keyConfig.row];
-    res[key] = keyConfig.parse(strVal);
+  for (const key in rowSchema) {
+    const keyConfig = rowSchema[key];
+    const strVal = row[keyConfig.col];
+    res[key] = keyConfig.parser(strVal);
   }
   return res;
 }
 
-function parseMentions(txt) {
-  const rows = txt.split("\n")
+function parseTSV(txt, rowSchema) {
+  return txt.split("\n")
     .map(l => l.split("\t"))
-    .map(r => parseRow(r))
+    .map(r => parseRow(r, rowSchema));
+}
+
+function parseMentions(txt) {
+  return parseTSV(txt, filteredMentionsSchema)
     .filter(r => r.mentionType === 1);
-  console.log(rows.slice(0, 3));
+}
+
+function parseEvents(txt) {
+  return parseTSV(txt, filteredEventsSchema);
 }
 
 function fetchMentionsEvents(date) {
@@ -49,10 +62,19 @@ function fetchMentionsEvents(date) {
     d = strDateTimeFromDate(date);
   }
 
-  const url = CONFIG.END_POINT_LIVE_GDELT_DATA + "20181109173000.mentions.CSV.zip";
-  fetchZip(url).then(res => {
+  const urlMentions = CONFIG.END_POINT_LIVE_GDELT_DATA + "20181109173000.mentions.CSV.zip";
+  fetchZip(urlMentions).then(res => {
     if (res.success) {
-      parseMentions(res.data);
+      console.log(parseMentions(res.data));
+    } else {
+      throw new Error();
+    }
+  });
+
+  const urlEvents = CONFIG.END_POINT_LIVE_GDELT_DATA + "20181109173000.export.CSV.zip";
+  fetchZip(urlEvents).then(res => {
+    if (res.success) {
+      console.log(parseEvents(res.data));
     } else {
       throw new Error();
     }
