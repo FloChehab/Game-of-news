@@ -7,6 +7,7 @@
   "license": "BSD-2-Clause",
   "homepage": "https://flochehab.github.io/Game-of-news/",
   "scripts": {
+    "lint": "eslint \"./app/**/*.js\"",
     "dev": "cross-env NODE_ENV=dev webpack-dev-server --progress --mode development --config webpack.config.dev.js",
     "build": "webpack -p --progress --mode production --config webpack.config.build.js"
   },
@@ -23,6 +24,7 @@
     "clean-webpack-plugin": "0.1.19",
     "cross-env": "5.2.0",
     "css-loader": "1.0.0",
+    "eslint": "^5.8.0",
     "file-loader": "2.0.0",
     "html-webpack-plugin": "3.2.0",
     "node-sass": "4.9.3",
