@@ -1,5 +1,9 @@
-// Function to create a Date object corresponding to a string such as
-// "20150218224500" => Wed Feb 18 2015 23:45:00 GMT+0100 (Central European Standard Time)
+/**
+ * Function to create a Date object corresponding to a string such as
+ *
+ * @param {String} str ex: "20150218224500"
+ * @returns {Date} ex: Wed Feb 18 2015 23:45:00 GMT+0100 (Central European Standard Time)
+ */
 function dateFromStrDateTime(str) {
   const regExpDateDetail = /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/;
   const matches = regExpDateDetail.exec(str);

@@ -64,5 +64,7 @@ class DataManager {
   }
 }
 
-const dataManager = new DataManager();
-export default dataManager;
+const dataManagerInstance = new DataManager();
+// We export only the instance, we shouldn't use multiple instances of this.
+// No need to export the class.
+export default dataManagerInstance;

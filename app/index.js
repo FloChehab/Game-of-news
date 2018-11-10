@@ -2,15 +2,18 @@
  * Application entry point
  */
 
-// Load application styles
-// import 'styles/index.scss';
-// import fetchEventsMentions from "./fetchData/fetchEventsMentions";
-import CONFIG from "./config";
-import dataManager from "./fetchData/DataManger";
+import appInstance from "./App";
 
 // ================================
-// START YOUR APP HERE
+// START of the app
 // ================================
 
-//fetchEventsMentions(CONFIG.FIRST_FETCHABLE_GDELT_CSV_DATETIME).then( obj => console.log(obj.data));
-dataManager.get15MinData(CONFIG.FIRST_FETCHABLE_GDELT_CSV_DATETIME).then( data => console.log(data, dataManager));
+function whenDocumentLoaded(action) {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", action);
+  } else {
+    action();
+  }
+}
+
+whenDocumentLoaded(() => appInstance.init());

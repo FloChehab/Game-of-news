@@ -1,22 +1,22 @@
 import CONFIG from "../../config";
+import fetchLastUpdateDateInstance from "../FetchLastUpdateDate";
+
 
 /**
  * Function to test that the files from a given date(time)
  * Can be fetch from GDELT server.
  *
- * The maxDate should be specified with the one parsed from
- * letest....txt
- *
  * @param {Date} date date to test
- * @param {Date} [maxDate=null] maxDate to test against
  * @returns {bool} Does the date pass the test
  */
-function dateValid(date, maxDate = null) {
+function dateValid(date) {
   if (date < CONFIG.FIRST_FETCHABLE_GDELT_CSV_DATETIME) {
     return false;
   }
 
-  if (maxDate && date > maxDate) {
+  const maxDate = fetchLastUpdateDateInstance.get();
+
+  if (maxDate !== false && date > maxDate) {
     return false;
   }
 
