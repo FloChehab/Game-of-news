@@ -2,6 +2,7 @@ import dateFromStrDateTime from "./fetchData/utils/dateFromStrDateTime";
 
 const CONFIG = {
   FIRST_FETCHABLE_GDELT_CSV_DATETIME: dateFromStrDateTime("20150218224500"),
+  MAX_15_MIN_INTERVALS: 40,
   END_POINT_LIVE_GDELT_DATA: "/data/extracts/",
   //"END_POINT_LIVE_GDELT_DATA": "https://gdelt-proxy-epfl-data-viz.herokuapp.com/proxy/gdeltv2/",
   BASE_END_POINT_GDELT_LAST_UPDATE_CSV: "lastupdate.txt",

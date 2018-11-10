@@ -87,7 +87,7 @@ function mergeEventsMentions(events, mentions, join) {
  * @param {string} [join="leftJoinMentions"] Type of join. "leftJoinMentions" or "innerJoin"
  * @returns {Promise({date: Date, success: bool, data: Array[Obj] [, errors: errors]})}
  */
-async function fetchMentionsEvents(date, join = "leftJoinMentions") {
+async function fetchEventsMentions(date, join = "leftJoinMentions") {
   if (!dateValid(date)) {
     throw new Error("Date is not valid in fetchMentionsEvents!");
   }
@@ -107,4 +107,4 @@ async function fetchMentionsEvents(date, join = "leftJoinMentions") {
     });
 }
 
-export default fetchMentionsEvents;
+export default fetchEventsMentions;
