@@ -3,82 +3,108 @@ import CONFIG from "../config.js";
 import eventsSchema from "./schemas/eventsSchema";
 import mentionsSchema from "./schemas/mentionsSchema";
 import { filterCompiledSchema } from "./schemas/utils";
-
-import JSZip from "jszip";
+import { fetchZip } from "./utils/zip";
+import TSVParser from "./utils/tsv";
+import dateValid from "./utils/dateValid";
 
 const filteredMentionsSchema = filterCompiledSchema(mentionsSchema, CONFIG.MENTIONS_CSV_FILTER);
 const filteredEventsSchema = filterCompiledSchema(eventsSchema, CONFIG.EVENTS_CSV_FILTER);
 
-async function unzipBlob(blob) {
-  try {
-    const zipObj = await JSZip.loadAsync(blob);
-    const files = zipObj.files;
-    const file = files[Object.keys(files)[0]]; // there is only file in each zip
-    const txt = await file.async("text");
-    return { success: true, data: txt };
-  } catch (error) {
-    return { success: false, error };
+const mentionsParser = new TSVParser(filteredMentionsSchema, (r) => r.mentionType === 1);
+const eventsParser = new TSVParser(filteredEventsSchema);
+
+
+/**
+ * Fetches a ziped tsv file and parse it
+ *
+ * @param {string} url url to fetch
+ * @param {TSVParser} tsvParser TSVparser to use for parsing the file
+ * @returns {Object{ success: bool, data: Array[Object]}} Parsed data if successful
+ */
+async function fetchAndParseTSV(url, tsvParser) {
+  const tsvFile = await fetchZip(url);
+  if (tsvFile.success) {
+    return { success: true, data: tsvParser.parse(tsvFile.data) };
+  } else {
+    return tsvFile;
   }
 }
 
-async function fetchZip(url) {
-  try {
-    const response = await fetch(url);
-    const blob = await response.blob();
-    return unzipBlob(blob);
-  } catch (error) {
-    return { success: false, error };
-  }
+/**
+ * Fetches and parse the mentions file corresponding the date
+ *
+ * @param {Date} date
+ * @returns {Object{ success: bool, data: Array[Object]}} Parsed data if successful
+ */
+async function fetchMentions(date) {
+  const urlMentions = CONFIG.END_POINT_LIVE_GDELT_DATA + strDateTimeFromDate(date) + CONFIG.MENTIONS_CSV_END_NAME;
+  return fetchAndParseTSV(urlMentions, mentionsParser);
 }
 
-function parseRow(row, rowSchema) {
-  let res = {};
-  for (const key in rowSchema) {
-    const keyConfig = rowSchema[key];
-    const strVal = row[keyConfig.col];
-    res[key] = keyConfig.parser(strVal);
-  }
-  return res;
+
+/**
+ * Fetches and parse the events file corresponding the date
+ *
+ * @param {Date} date
+ * @returns {Object{ success: bool, data: Array[Object]}} Parsed data if successful
+ */
+async function fetchEvents(date) {
+  const urlEvents = CONFIG.END_POINT_LIVE_GDELT_DATA + strDateTimeFromDate(date) + CONFIG.EVENTS_CSV_END_NAME;
+  return fetchAndParseTSV(urlEvents, eventsParser);
 }
 
-function parseTSV(txt, rowSchema) {
-  return txt.split("\n")
-    .map(l => l.split("\t"))
-    .map(r => parseRow(r, rowSchema));
-}
 
-function parseMentions(txt) {
-  return parseTSV(txt, filteredMentionsSchema)
-    .filter(r => r.mentionType === 1);
-}
-
-function parseEvents(txt) {
-  return parseTSV(txt, filteredEventsSchema);
-}
-
-function fetchMentionsEvents(date) {
-  let d = date;
-  if (typeof date !== "string") {
-    d = strDateTimeFromDate(date);
-  }
-
-  const urlMentions = CONFIG.END_POINT_LIVE_GDELT_DATA + "20181109173000.mentions.CSV.zip";
-  fetchZip(urlMentions).then(res => {
-    if (res.success) {
-      console.log(parseMentions(res.data));
-    } else {
-      throw new Error();
-    }
+/**
+ * Merge the two tables of events and mentions
+ *
+ * @param {Array[Object]} events Array of events
+ * @param {Array[Object]} mentions Array of mentions
+ * @param {string} join Type of join. "leftJoinMentions" or "innerJoin"
+ * @returns {Array[Object]} Result of the merge: for each mention, the event information is added to the field event.
+ */
+function mergeEventsMentions(events, mentions, join) {
+  // optimization
+  const eventsMap = new Map(events.map(info => [info.eventId, info]));
+  const data = mentions.map(info => {
+    let mergedInfo = Object.assign({}, info);
+    mergedInfo.event = eventsMap.get(info.eventId);
+    return mergedInfo;
   });
+  if (join === "leftJoinMentions") {
+    return data;
+  } else if (join === "innerJoin") {
+    return data.filter(mention => mention.event);
+  } else {
+    throw new Error("Join option not supported in mergeEventsMentions");
+  }
+}
 
-  const urlEvents = CONFIG.END_POINT_LIVE_GDELT_DATA + "20181109173000.export.CSV.zip";
-  fetchZip(urlEvents).then(res => {
-    if (res.success) {
-      console.log(parseEvents(res.data));
-    } else {
-      throw new Error();
-    }
-  });
+/**
+ * Given a date, this function returns a Promise with the result of fetching
+ * the mentions and events table at a given date, and making the merge of the two.
+ *
+ * @param {*} date
+ * @param {string} [join="leftJoinMentions"] Type of join. "leftJoinMentions" or "innerJoin"
+ * @returns {Promise({date: Date, success: bool, data: Array[Obj] [, errors: errors]})}
+ */
+async function fetchMentionsEvents(date, join = "leftJoinMentions") {
+  if (!dateValid(date)) {
+    throw new Error("Date is not valid in fetchMentionsEvents!");
+  }
+  return Promise.all([fetchEvents(date), fetchMentions(date)])
+    .then(fetchedData => {
+      const [events, mentions] = fetchedData;
+      if (mentions.success && events.success) {
+        const data = mergeEventsMentions(events.data, mentions.data, join);
+        return { success: true, data, date };
+      } else {
+        return {
+          success: false,
+          errors: { mentions: mentions.error, events: events.error },
+          date
+        };
+      }
+    });
 }
 
 export default fetchMentionsEvents;

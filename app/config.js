@@ -1,12 +1,12 @@
 import dateFromStrDateTime from "./fetchData/utils/dateFromStrDateTime";
 
 const CONFIG = {
-  MAX_FETCHABLE_GDELT_CSV_DATETIME: dateFromStrDateTime("20150218224500"),
-  END_POINT_LIVE_GDELT_DATA: "/tmp/",
+  FIRST_FETCHABLE_GDELT_CSV_DATETIME: dateFromStrDateTime("20150218224500"),
+  END_POINT_LIVE_GDELT_DATA: "/data/extracts/",
   //"END_POINT_LIVE_GDELT_DATA": "https://gdelt-proxy-epfl-data-viz.herokuapp.com/proxy/gdeltv2/",
   BASE_END_POINT_GDELT_LAST_UPDATE_CSV: "lastupdate.txt",
-  EVENTS_CSV_END_NAME: ".export.CSV.zip",
-  MENTIONS_CSV_END_NAME: ".mentions.CSV.zip",
+  EVENTS_CSV_END_NAME: ".translation.export.CSV.zip",
+  MENTIONS_CSV_END_NAME: ".translation.mentions.CSV.zip",
   MENTIONS_CSV_FILTER: [
     "eventId",
     "dateEventAdded",
