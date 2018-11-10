@@ -16,10 +16,26 @@ $ npm install
 ```
 
 ## Development
+
+### Local GDELT API
+
+To replicate part of the GDELT API for devlopment purpose. Run the `fetch_extacts.py` script in the `data/extracts/` folder.
+
+```bash
+cd ./data/extracts
+python3 ./fetch_extracts.py
+```
+
+This will fetch approximetaly the first day of available data on the API.
+
+
+### Running
+
 Run the local webpack-dev-server with livereload and autocompile on [http://localhost:8080/](http://localhost:8080/)
 ```sh
 $ npm run dev
 ```
+
 ## Deployment
 Build the current application
 ```sh

@@ -9,6 +9,7 @@ dist/
 node_modules/
 bower_components/
 */tmp/
+tmp/
 */*/.ipynb_checkpoints/
 
 ## Files
