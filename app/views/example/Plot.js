@@ -16,23 +16,17 @@ class Plot {
     div.setAttribute("id", "dumbPlot");
     appDiv.appendChild(div);
 
-    let btn = document.createElement("button");
-    btn.innerHTML = "Fetch next ? :)";
-    btn.onclick = () => this.fetchNext();
-    appDiv.appendChild(btn);
+    const bunchOfData = dataManagerInstance.getSampleData(10);
+    Promise.all(bunchOfData)
+      .then((allData) => {
+        allData.forEach(data => this.append(data));
+        this.update();
+      });
+
   }
 
   append(data) {
     this.data.push(data);
-  }
-
-  fetchNext() {
-    const date = this.generator.next().value;
-    dataManagerInstance.get15MinData(date)
-      .then(data => {
-        this.append(data);
-        this.update();
-      });
   }
 
   update() {

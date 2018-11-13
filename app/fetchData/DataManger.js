@@ -1,5 +1,6 @@
 import CONFIG from "../config";
 import fetchEventsMentions from "./fetchEventsMentions";
+import { dateGenerator } from "./utils/datesBetween";
 
 
 /**
@@ -11,6 +12,10 @@ class DataManager {
   constructor() {
     this.max15MinIntervals = CONFIG.MAX_15_MIN_INTERVALS;
     this.intervalData = new Map();
+
+
+    // TODO remove this when not nessary anymore
+    this.generator = dateGenerator(CONFIG.FIRST_FETCHABLE_GDELT_CSV_DATETIME);
   }
 
   getMax15MinIntervals() { return this.max15MinIntervals; }
@@ -61,6 +66,23 @@ class DataManager {
       this.store(date, data);
       return new Promise((success) => success(data));
     }
+  }
+
+
+  /**
+   * Fetch a sample of data from the first available time interval.
+   *
+   * @param {number} n number of 15 minutes events you want to fetch
+   * @returns {Array[Promise]} A list of Promise containing the fetched data wrapped in a succcess object.
+   * @memberof DataManager
+   */
+  getSampleData(n) {
+    if (n > CONFIG.MAX_15_MIN_INTERVALS) {
+      throw new Error(`${n} is too big`);
+    }
+
+    this.generator = dateGenerator(CONFIG.FIRST_FETCHABLE_GDELT_CSV_DATETIME);
+    return [...Array(n).keys()].map(() => this.get15MinData(this.generator.next().value));
   }
 }
 
