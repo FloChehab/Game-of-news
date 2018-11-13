@@ -14,7 +14,7 @@ function dateValid(date) {
     return false;
   }
 
-  const maxDate = fetchLastUpdateDateInstance.get();
+  const maxDate = fetchLastUpdateDateInstance.getNow();
 
   if (maxDate !== false && date > maxDate) {
     return false;

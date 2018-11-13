@@ -39,6 +39,16 @@ class FetchLastUpdateDate {
   }
 
   /**
+   * Get the current date storred without trying to make a fetch request.
+   *
+   * @returns The current date stored in the instance or false.
+   * @memberof FetchLastUpdateDate
+   */
+  getNow(){
+    return this.date;
+  }
+
+  /**
    * Parse a string like 140798 db1656643ba5a4bed625cabcdb0fa25a http://data.gdeltproject.org/gdeltv2/20181109151500.translation.export.CSV.zip
    *  To extract: 20181109151500
    *  And convert it to date
