@@ -27,47 +27,56 @@ class TimeWindowSelector {
   constructor() {
     this.lastSelection = false;
     this.lastSelectionBrushing = false;
-  }
 
-  init() {
-    let self = this;
-
-    const x = d3.scaleTime()
-      .domain([new Date(2013, 7, 1), new Date(2013, 7, 3)])
-      .rangeRound([0, width]);
-
-    const svg = d3.select(DIVID).append("svg")
+    this.svg = d3.select(DIVID).append("svg")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    svg.append("g")
+    this.xScale = d3.scaleTime();
+    this.xAxisCall = d3.axisBottom(this.xScale);
+  }
+
+  initAxis() {
+
+  }
+  init() {
+    // copy reference to this since d3 will bind the svg element to it
+    let self = this;
+
+    this.xScale
+      .domain([new Date(2013, 7, 1), new Date(2013, 7, 3)])
+      .rangeRound([0, width]);
+
+    const brush = d3.brushX()
+      .extent([[0, 0], [width, height]])
+      .on("brush", whileBrushing)
+      .on("end", brushingEnded);
+
+    this.svg.append("g")
       .attr("class", "axis axis--grid")
       .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x)
+      .call(d3.axisBottom(this.xScale)
         .ticks(d3.utcMinute, 15)
         .tickSize(-height)
         .tickFormat(function () { return null; }))
       .selectAll(".tick")
       .classed("tick--minor", function (d) { return d.getHours(); });
 
-    svg.append("g")
+    this.svg.append("g")
       .attr("class", "axis axis--x")
       .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x)
+      .call(d3.axisBottom(this.xScale)
         .ticks(d3.timeHour.every(2))
         .tickPadding(0))
       .attr("text-anchor", null)
       .selectAll("text")
       .attr("x", 6);
 
-    svg.append("g")
+    this.svg.append("g")
       .attr("class", "brush")
-      .call(d3.brushX()
-        .extent([[0, 0], [width, height]])
-        .on("brush", whileBrushing)
-        .on("end", brushingEnded));
+      .call(brush);
 
     /**
      * Gets the date being selected
@@ -77,7 +86,7 @@ class TimeWindowSelector {
     function getSelectedDates() {
       if (!d3.event.sourceEvent) return false; // Only when the input is physical (and not due to animation)
       if (!d3.event.selection) return false; // Ignore empty selections.
-      return d3.event.selection.map(x.invert);
+      return d3.event.selection.map(self.xScale.invert);
     }
 
     /**
@@ -104,7 +113,7 @@ class TimeWindowSelector {
       const nq = numberOfQuartersBetween(...roundedSelectedDates);
       if (nq > CONFIG.MAX_15_MIN_INTERVALS && !isRectMoving()) {
         // we limit the number of intervals that can be fetch
-        d3.select(this).call(d3.event.target.move, self.lastSelectionBrushing.map(x));
+        d3.select(this).call(d3.event.target.move, self.lastSelectionBrushing.map(self.xScale));
         setSelectionClass("out-of-range");
       } else {
         self.lastSelectionBrushing = roundedSelectedDates;
@@ -149,7 +158,7 @@ class TimeWindowSelector {
 
       self.lastSelection = roundedSelectedDates;
 
-      d3.select(this).transition().call(d3.event.target.move, roundedSelectedDates.map(x));
+      d3.select(this).transition().call(d3.event.target.move, roundedSelectedDates.map(self.xScale));
     }
 
   }
