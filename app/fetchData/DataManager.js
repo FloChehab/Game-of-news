@@ -12,12 +12,14 @@ class DataManager {
   constructor() {
     this.max15MinIntervals = CONFIG.MAX_15_MIN_INTERVALS;
     this.intervalData = new Map();
-
+    this.FIRST_FETCHABLE_GDELT_CSV_DATETIME = CONFIG.FIRST_FETCHABLE_GDELT_CSV_DATETIME;
+    this.LAST_FETCHABLE_GDELT_CSV_DATETIME = false;
 
     // TODO remove this when not nessary anymore
     this.generator = dateGenerator(CONFIG.FIRST_FETCHABLE_GDELT_CSV_DATETIME);
   }
 
+  setLastFetchableDateTime(date) { this.LAST_FETCHABLE_GDELT_CSV_DATETIME = date; }
   getMax15MinIntervals() { return this.max15MinIntervals; }
   setMax15MinIntervals(val) { this.max15MinIntervals = val; }
 

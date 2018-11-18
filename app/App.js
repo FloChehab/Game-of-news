@@ -1,7 +1,12 @@
-import CONFIG from "./config";
-import fetchLastUpdateDateInstance from "./fetchData/FetchLastUpdateDate";
+import MoveTo from "moveto";
 
-import Plot from "./views/example/Plot";
+import fetchLastUpdateDateInstance from "./fetchData/FetchLastUpdateDate";
+import dataManagerInstance from "./fetchData/DataManager";
+import Dashboard from "./views/dashboard/Dashboard";
+import Story from "./Story";
+import "../assets/styles/index.scss";
+import "bootstrap/dist/css/bootstrap.min.css";
+// import { format } from "path";
 
 /**
  * Class the manages all the app
@@ -9,9 +14,7 @@ import Plot from "./views/example/Plot";
  * @class App
  */
 class App {
-  constructor() {
-    this.maxDateFetchableCSV = CONFIG.FIRST_FETCHABLE_GDELT_CSV_DATETIME;
-  }
+  constructor() { }
 
   /**
    * Function that should be called first
@@ -25,15 +28,41 @@ class App {
     p.setAttribute("id", pId);
     document.getElementById("app").append(p);
 
+    const easeFunctions = {
+      easeInQuad: function (t, b, c, d) {
+        t /= d;
+        return c * t * t + b;
+      },
+      easeOutQuad: function (t, b, c, d) {
+        t /= d;
+        return -c * t * (t - 2) + b;
+      }
+    };
+
+    const moveTo = new MoveTo({
+      ease: "easeInQuad"
+    }, easeFunctions);
+    const triggers = document.getElementsByClassName("js-trigger");
+    for (const trigger of triggers) {
+      moveTo.registerTrigger(trigger);
+    }
+
     fetchLastUpdateDateInstance.get()
       .then(data => {
         if (!data.success) {
           p.innerText = "ERROR while starting API, please reload the page or contact admin";
         } else {
-          this.maxDateFetchableCSV = data.data;
+          for (let el of document.getElementsByClassName("API-REQUIRED")) {
+            el.setAttribute("style", ""); // remove the display None when everything is ready
+          }
+
+          dataManagerInstance.setLastFetchableDateTime(data.data);
           p.remove();
-          const plot = new Plot();
-          plot.init();
+
+          const story = new Story();
+          story.init();
+          const dashboard = new Dashboard();
+          dashboard.init();
         }
       });
 
