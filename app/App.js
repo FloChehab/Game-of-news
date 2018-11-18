@@ -1,7 +1,5 @@
-import CONFIG from "./config";
 import fetchLastUpdateDateInstance from "./fetchData/FetchLastUpdateDate";
-
-// import Plot from "./views/example/Plot";
+import dataManagerInstance from "./fetchData/DataManager";
 import Dashboard from "./views/dashboard/Dashboard";
 
 /**
@@ -10,9 +8,7 @@ import Dashboard from "./views/dashboard/Dashboard";
  * @class App
  */
 class App {
-  constructor() {
-    this.maxDateFetchableCSV = CONFIG.FIRST_FETCHABLE_GDELT_CSV_DATETIME;
-  }
+  constructor() { }
 
   /**
    * Function that should be called first
@@ -31,7 +27,7 @@ class App {
         if (!data.success) {
           p.innerText = "ERROR while starting API, please reload the page or contact admin";
         } else {
-          this.maxDateFetchableCSV = data.data;
+          dataManagerInstance.setLastFetchableDateTime(data.data);
           p.remove();
           const dashboard = new Dashboard();
           dashboard.init();

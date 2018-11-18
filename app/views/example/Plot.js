@@ -1,6 +1,6 @@
 // import * as d3 from "d3";
 import CONFIG from "../../config";
-import dataManagerInstance from "../../fetchData/DataManger";
+import dataManagerInstance from "../../fetchData/DataManager";
 import { dateGenerator } from "../../fetchData/utils/datesBetween";
 
 

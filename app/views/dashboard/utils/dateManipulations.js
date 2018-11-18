@@ -49,3 +49,17 @@ export function numberOfQuartersBetween(date1, date2) {
 export function datesAreEqual(date1, date2) {
   return date1.toString() == date2.toString();
 }
+
+
+/**
+ * Convert a date to yyyy-mm-dd format
+ *
+ * @export
+ * @param {Date} date
+ * @returns
+ */
+export function dateToStrIso(date) {
+  const mm = String(date.getMonth() + 1);
+  const dd = String(date.getDate());
+  return `${date.getFullYear()}-${(mm > 9 ? "" : "0") + mm}-${(dd > 9 ? "" : "0") + dd}`;
+}

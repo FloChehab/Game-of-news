@@ -15,3 +15,10 @@
         stroke-width: 3px;
     }
 }
+
+#timeWindowSelectorWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}

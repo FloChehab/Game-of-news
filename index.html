@@ -11,7 +11,13 @@
   <h1>Game of News</h1>
   <div id='app'></div>
   <div id='dashboard'>
-    <div id='timeWindowSelector'></div>
+    <div id='timeWindowSelectorWrapper'>
+      <div id='timeWindowSelector'></div>
+      <div>
+        <p>Center window on:</p>
+        <input id='dateTimeWindowSelector' type='date' required pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"/>
+      </div>
+    </div>
   </div>
 </body>
 

@@ -33,7 +33,7 @@ class TimeWindowSelector {
     let self = this;
 
     const x = d3.scaleTime()
-      .domain([new Date(2013, 7, 1), new Date(2013, 7, 2)])
+      .domain([new Date(2013, 7, 1), new Date(2013, 7, 3)])
       .rangeRound([0, width]);
 
     const svg = d3.select(DIVID).append("svg")
@@ -56,7 +56,7 @@ class TimeWindowSelector {
       .attr("class", "axis axis--x")
       .attr("transform", "translate(0," + height + ")")
       .call(d3.axisBottom(x)
-        .ticks(d3.timeHour)
+        .ticks(d3.timeHour.every(2))
         .tickPadding(0))
       .attr("text-anchor", null)
       .selectAll("text")
