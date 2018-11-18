@@ -4,6 +4,7 @@
 .sass-cache
 
 ## Directories
+.vscode/
 log/
 dist/
 node_modules/

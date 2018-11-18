@@ -1,7 +1,8 @@
 import CONFIG from "./config";
 import fetchLastUpdateDateInstance from "./fetchData/FetchLastUpdateDate";
 
-import Plot from "./views/example/Plot";
+// import Plot from "./views/example/Plot";
+import Dashboard from "./views/dashboard/Dashboard";
 
 /**
  * Class the manages all the app
@@ -32,8 +33,8 @@ class App {
         } else {
           this.maxDateFetchableCSV = data.data;
           p.remove();
-          const plot = new Plot();
-          plot.init();
+          const dashboard = new Dashboard();
+          dashboard.init();
         }
       });
 
