@@ -8,17 +8,81 @@
 </head>
 
 <body>
-  <h1>Game of News</h1>
-  <div id='app'></div>
-  <div id='dashboard'>
-    <div id='timeWindowSelectorWrapper'>
-      <div id='timeWindowSelector'></div>
-      <div>
-        <p>Center window on:</p>
-        <input id='dateTimeWindowSelector' type='date' required pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"/>
+  <!-- Home block -->
+  <div id="home-block" class="c-section c-section--primary d-flex flex-column justify-content-center align-items-center">
+    <h1 class="display-3">Game of News</h1>
+    <p class="lead mb-2">Explore the news in a different way</p>
+    <!-- <a class="c-section__link mb-4" href="https://github.com/hsnaydd/moveTo">Documentation on GitHub</a> -->
+    <div id='app'></div>
+    <div class="d-flex justify-content-center" style="display: none;" class="API-REQUIRED">
+      <a href="#story-block" class="btn btn-lg c-section__btn js-trigger">Go to story</a>
+      <a href="#dashboard-block" class="btn btn-lg secondaty c-section__btn js-trigger">Go to dashboard</a>
+    </div>
+
+  </div>
+
+  <div id="content" class="API-REQUIRED" style="display: none;">
+    <!-- Story block -->
+    <div id="story-block" class="c-section c-section--secondary">
+
+      <section id='intro'>
+        <h1>Exploring</h1>
+        <p class='intro__dek'>
+          Start scrolling and follow a guided tour
+        </p>
+      </section>
+
+      <section id='scroll'>
+
+        <div class='scroll__graphic sticky'>
+          <div class='chart'>
+            <p>0</p>
+          </div>
+        </div>
+        <div class='scroll__text'>
+          <div class='step' data-step='1'>
+            <p>STEP 1</p>
+            <p> Bonjour :) </p>
+          </div>
+          <div class='step' data-step='2'>
+            <p>STEP 2</p>
+          </div>
+          <div class='step' data-step='3'>
+            <p>STEP 3</p>
+          </div>
+          <div class='step' data-step='4'>
+            <p>STEP 4</p>
+          </div>
+        </div>
+
+      </section>
+      <!-- <section id='outro'></section> -->
+
+    </div>
+
+
+    <div id="dashboard-block" class="c-section c-section--secondary">
+      <!--  -->
+      <!--  -->
+      <a href="#story-block" class="btn btn-lg c-section__btn js-trigger">Go to story</a>
+      <a href="#home-block" class="btn btn-lg c-section__btn js-trigger">Go to home</a>
+      <div id='dashboard'>
+
+
       </div>
+      <div class="c-section__footer p-2">
+        <div id='timeWindowSelectorWrapper'>
+          <div id='timeWindowSelector'></div>
+          <div>
+            <p>Center window on:</p>
+            <input id='dateTimeWindowSelector' type='date' required pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" />
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
+
 </body>
 
 </html>
