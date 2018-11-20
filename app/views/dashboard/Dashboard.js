@@ -3,6 +3,12 @@ import dataManagerInstance from "../../fetchData/DataManager";
 import { dateToStrIso } from "./utils/dateManipulations";
 import StackedGraph from "../stackedGraph/StackedGraph";
 
+/**
+ * Function that sets the datePicker field to the correct value + with the correct time limit.
+ * It also returns the selected date.
+ *
+ * @returns {Date}
+ */
 function setUpDateWindowSlector() {
   const datePicker = document.getElementById("dateTimeWindowSelector");
   const first = dataManagerInstance.FIRST_FETCHABLE_GDELT_CSV_DATETIME,
@@ -11,14 +17,16 @@ function setUpDateWindowSlector() {
   datePicker.setAttribute("min", dateToStrIso(first));
   datePicker.setAttribute("max", dateToStrIso(last));
   datePicker.setAttribute("value", dateToStrIso(last));
+
+  return last;
 }
 
 class Dashboard {
   constructor() { }
 
   init() {
-    setUpDateWindowSlector();
-    new TimeWindowSelector().init();
+    const highlightedDate = setUpDateWindowSlector();
+    new TimeWindowSelector(highlightedDate).init();
 
     //Add random streamgraph handleResize
     const stackedGraphContext = document.createElement("div");
