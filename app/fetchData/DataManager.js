@@ -18,9 +18,9 @@ class DataManager {
     // TODO remove this when not nessary anymore
     this.generator = dateGenerator(CONFIG.FIRST_FETCHABLE_GDELT_CSV_DATETIME);
 
-    // Store active data
-    this.selectedDates = Array();
-    this.selectedData = Array();
+    this.currentData = Array();
+    // Subscribed views
+    this.subscribedViews = Array();
   }
 
   setLastFetchableDateTime(date) { this.LAST_FETCHABLE_GDELT_CSV_DATETIME = date; }
@@ -74,6 +74,70 @@ class DataManager {
     }
   }
 
+  /**
+   * Subscribes a view to the instance and returns the currently selected data.
+   * Only views that have an updateData function can be subscribed.
+   *
+   * @param {Object} view The view to subscribe.
+   * @returns {Array[Promise]} The currently selected data.
+   * @memberof DataManager
+   */
+  subscribe(view) {
+    if (typeof view.updateData !== "function") {
+      throw new Error("View should have an updateData function!");
+    }
+    if (!this.subscribedViews.includes(view)) {
+      this.subscribedViews.push(view);
+    }
+    return this.currentData;
+  }
+
+  /**
+   * Updates selected data and propagates changes to subscribed views.
+   *
+   * @param {Array[Promise]} newData
+   * @memberof DataManager
+   */
+  updateData(newData) {
+    this.currentData = newData;
+    this.subscribedViews.forEach((v) => v.updateData(this.currentData));
+  }
+
+  /**
+   * Updates selected data based on a new time window.
+   *
+   * @param {Array[Date]} dates The 15-min intervals that comprise the new time window.
+   * @memberof DataManager
+   */
+  updateTimeWindow(dates) {
+    const newData = dates.map((d) =>  this.get15MinData(d));
+    this.updateData(newData);
+  }
+
+  /**
+   * Initializes selected data based on a default time window.
+   *
+   * @memberof DataManager
+   */
+  init() {
+    const n = 30;//CONFIG.MAX_15_MIN_INTERVALS;
+    this.generator = dateGenerator(CONFIG.FIRST_FETCHABLE_GDELT_CSV_DATETIME);
+    const dates = [...Array(n).keys()].map(() => this.generator.next().value);
+    this.updateTimeWindow(dates);
+  }
+
+  /**
+   * Updates selected data based on a time window defined by specified start and end dates.
+   * TODO: May be irrelevant depending on how Florent has implemented the time window selector.
+   *
+   * @param {Date} startDate
+   * @param {Date} endDate
+   * @memberof DataManager
+   */
+  selectDataBetweenDates(startDate, endDate) {
+    const dates = datesBetween(startDate, endDate);
+    this.updateTimeWindow(dates);
+  }
 
   /**
    * Fetch a sample of data from the first available time interval.
@@ -90,76 +154,10 @@ class DataManager {
     this.generator = dateGenerator(CONFIG.FIRST_FETCHABLE_GDELT_CSV_DATETIME);
     return [...Array(n).keys()].map(() => this.get15MinData(this.generator.next().value));
   }
-
-  /**
-   * Fetch data for a specified list of 15-min intervals.
-   *
-   * @param {Array[Date]} A list of the intervals for which to fetch data.
-   * @returns {Promise} A Promise with the fetched data.
-   * @memberof DataManager
-   */
-  async selectData(dates) {
-    await Promise.all(dates.map((d) => this.get15MinData(d)))
-      .then((data) => { this.selectedData = data; });
-
-    return new Promise((success) => {
-      this.selectedDates = dates;
-      return success(this.selectedData);
-    });
-  }
-
-  /**
-   * Fetch some initial data so that the instance is able to provide data to
-   * the views.
-   *
-   * @returns {Promise} A Promise with the initial data.
-   * @memberof DataManager
-   */
-  init() {
-    const n = 30;//CONFIG.MAX_15_MIN_INTERVALS;
-    this.generator = dateGenerator(CONFIG.FIRST_FETCHABLE_GDELT_CSV_DATETIME);
-    const selected = [...Array(n).keys()].map(() => this.generator.next().value);
-    return this.selectData(selected);
-  }
-
-  /**
-   * Fetch data between two specified dates.
-   *
-   * @returns {Promise}
-   * @memberof DataManager
-   */
-  selectDataBetweenDates(date1, date2) {
-    const selected = datesBetween(date1, date2);
-    return this.selectData(selected);
-  }
-
-  /**
-   * Getter for the selectedData property.
-   *
-   * @memberof DataManager
-   */
-  get data() {
-    if (this.selectedData.length < 1) {
-      return this.init();
-    } else {
-      return new Promise((success) => success(this.selectedData));
-    }
-  }
-
-  /**
-   * Getter for the selectedDates property.
-   *
-   * @memberof DataManager
-   */
-  get dates() {
-    if (this.selectedDates.length < 1) {
-      throw new Error("Call data first");
-    }
-    return this.selectedDates;
-  }
 }
 
 const dataManagerInstance = new DataManager();
+dataManagerInstance.init(); //Already fetch some default data.
 // We export only the instance, we shouldn't use multiple instances of this.
 // No need to export the class.
 export default dataManagerInstance;
