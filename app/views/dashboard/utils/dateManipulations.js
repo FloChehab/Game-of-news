@@ -63,3 +63,28 @@ export function dateToStrIso(date) {
   const dd = String(date.getDate());
   return `${date.getFullYear()}-${(mm > 9 ? "" : "0") + mm}-${(dd > 9 ? "" : "0") + dd}`;
 }
+
+/**
+ * Function that returns a new date whith all attributes not related to date set to zero.
+ * Date will be centered on UTC time.
+ *
+ * @export
+ * @param {Date} date
+ * @returns
+ */
+export function roundDateTimeToDay(date) {
+  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 0, 0, 0, 0));
+}
+
+
+const nbMsInHour = 60 * 60 * 1000;
+/**
+ *
+ *
+ * @export
+ * @param {Date} date
+ * @param {number} hours
+ */
+export function addHourToDate(date, hours) {
+  return new Date(date.getTime() + hours * nbMsInHour);
+}
