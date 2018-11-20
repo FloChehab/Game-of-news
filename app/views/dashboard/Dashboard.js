@@ -1,6 +1,7 @@
 import TimeWindowSelector from "./TimeWindowSelector";
 import dataManagerInstance from "../../fetchData/DataManager";
 import { dateToStrIso } from "./utils/dateManipulations";
+import StackedGraph from "../stackedGraph/StackedGraph";
 
 function setUpDateWindowSlector() {
   const datePicker = document.getElementById("dateTimeWindowSelector");
@@ -18,8 +19,14 @@ class Dashboard {
   init() {
     setUpDateWindowSlector();
     new TimeWindowSelector().init();
-  }
 
+    //Add random streamgraph handleResize
+    const stackedGraphContext = document.createElement("div");
+    stackedGraphContext.setAttribute("id", "stackedGraph");
+    stackedGraphContext.setAttribute("style", "height: 600px");
+    document.getElementById("dashboard").appendChild(stackedGraphContext);
+    new StackedGraph(stackedGraphContext, 7).init();
+  }
 }
 
 export default Dashboard;
