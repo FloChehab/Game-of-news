@@ -26,7 +26,7 @@ export function* dateGenerator(beginDate) {
  */
 function datesBetween(date1, date2) {
   if (!dateValid(date1) || !dateValid(date2)) {
-    throw new Error("dates are not valid in datesBetween function");
+    throw new Error(`dates are not valid in datesBetween function: ${date1} | ${date2}`);
   }
 
   if (date1 > date2) {

@@ -1,6 +1,5 @@
 import * as d3 from "d3";
-// import dataManagerInstance from "../../fetchData/DataManger";
-// import { dateGenerator } from "../../fetchData/utils/datesBetween";
+import dataManagerInstance from "../../fetchData/DataManager";
 import "../../../assets/styles/TimeWindowSelector.scss";
 import {
   nearestQuarterDate,
@@ -152,13 +151,20 @@ class TimeWindowSelector {
 
       const roundedSelectedDates = selectedDates.map((date) => nearestQuarterDate(date));
       const nq = numberOfQuartersBetween(...roundedSelectedDates);
+
       if (nq > CONFIG.MAX_15_MIN_INTERVALS && !isRectMoving()) {
         // we limit the number of intervals that can be fetch
         d3.select(this).call(d3.event.target.move, self.lastSelectionBrushing.map(self.xScale));
         setSelectionClass("out-of-range");
       } else {
-        self.lastSelectionBrushing = roundedSelectedDates;
-        setSelectionClass("");
+        if (roundedSelectedDates[0].getTime() < dataManagerInstance.FIRST_FETCHABLE_GDELT_CSV_DATETIME.getTime() ||
+          roundedSelectedDates[1].getTime() > dataManagerInstance.LAST_FETCHABLE_GDELT_CSV_DATETIME.getTime()) {
+          d3.select(this).call(d3.event.target.move, self.lastSelectionBrushing.map(self.xScale));
+          setSelectionClass("out-of-range");
+        } else {
+          self.lastSelectionBrushing = roundedSelectedDates;
+          setSelectionClass("");
+        }
       }
     }
 
@@ -198,10 +204,15 @@ class TimeWindowSelector {
           new Date(d1.getTime() + 1), Math.ceil);
       }
 
-      self.lastSelection = roundedSelectedDates;
+      self.updateSelectionnedDateAndTellDataManager(roundedSelectedDates);
 
       d3.select(this).transition().call(d3.event.target.move, roundedSelectedDates.map(self.xScale));
     }
+  }
+
+  updateSelectionnedDateAndTellDataManager(dates) {
+    this.lastSelection = dates;
+    dataManagerInstance.selectDataBetweenDatesAndUpdateViews(...dates);
   }
 
   updateHighledDateAndRedraw(date) {
