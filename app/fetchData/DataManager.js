@@ -17,6 +17,10 @@ class DataManager {
 
     // TODO remove this when not nessary anymore
     this.generator = dateGenerator(CONFIG.FIRST_FETCHABLE_GDELT_CSV_DATETIME);
+
+    // Store active data
+    this.selectedDates = Array();
+    this.selectedData = Array();
   }
 
   setLastFetchableDateTime(date) { this.LAST_FETCHABLE_GDELT_CSV_DATETIME = date; }
@@ -85,6 +89,73 @@ class DataManager {
 
     this.generator = dateGenerator(CONFIG.FIRST_FETCHABLE_GDELT_CSV_DATETIME);
     return [...Array(n).keys()].map(() => this.get15MinData(this.generator.next().value));
+  }
+
+  /**
+   * Fetch data for a specified list of 15-min intervals.
+   *
+   * @param {Array[Date]} A list of the intervals for which to fetch data.
+   * @returns {Promise} A Promise with the fetched data.
+   * @memberof DataManager
+   */
+  async selectData(dates) {
+    await Promise.all(dates.map((d) => this.get15MinData(d)))
+      .then((data) => { this.selectedData = data });
+
+    return new Promise((success) => {
+      this.selectedDates = dates;
+      return success(this.selectedData)
+    });
+  }
+
+  /**
+   * Fetch some initial data so that the instance is able to provide data to
+   * the views.
+   *
+   * @returns {Promise} A Promise with the initial data.
+   * @memberof DataManager
+   */
+  init() {
+    const n = 30;//CONFIG.MAX_15_MIN_INTERVALS;
+    this.generator = dateGenerator(CONFIG.FIRST_FETCHABLE_GDELT_CSV_DATETIME);
+    const selected = [...Array(n).keys()].map(() => this.generator.next().value);
+    return this.selectData(selected);
+  }
+
+  /**
+   * Fetch data between two specified dates.
+   *
+   * @returns {Promise}
+   * @memberof DataManager
+   */
+  selectDataBetweenDates(date1, date2) {
+    const selected = datesBetween(date1, date2);
+    return this.selectData(selected);
+  }
+
+  /**
+   * Getter for the selectedData property.
+   *
+   * @memberof DataManager
+   */
+  get data() {
+    if (this.selectedData.length < 1) {
+      return this.init();
+    } else {
+      return new Promise((success) => success(this.selectedData));
+    }
+  }
+
+  /**
+   * Getter for the selectedDates property.
+   *
+   * @memberof DataManager
+   */
+  get dates() {
+    if (this.selectedDates.length < 1) {
+      throw new Error("Call data first");
+    }
+    return this.selectedDates;
   }
 }
 
