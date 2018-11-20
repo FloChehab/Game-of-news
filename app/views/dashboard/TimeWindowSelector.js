@@ -8,7 +8,8 @@ import {
   absDelayBetweenDates,
   datesAreEqual,
   addHourToDate,
-  roundDateTimeToDay
+  roundDateTimeToDay,
+  strIsoToDate
 } from "./utils/dateManipulations";
 
 import CONFIG from "../../config";
@@ -35,6 +36,8 @@ class TimeWindowSelector {
   constructor(highlightedDate) {
     this.highlightedDate = highlightedDate;
 
+    this.linkDateSelector();
+
     this.lastSelection = false;
     this.lastSelectionBrushing = false;
 
@@ -48,24 +51,32 @@ class TimeWindowSelector {
       .rangeRound([0, width]);
   }
 
-  initAxis() {
-    this.xScale
-      .domain(this.getAvailableTimeWindow());
+  linkDateSelector() {
+    const datePicker = document.getElementById("dateTimeWindowSelector");
+    datePicker.onchange = () => this.updateHighledDateAndRedraw(strIsoToDate(datePicker.value));
+  }
 
-    this.xAxis = d3.axisBottom(this.xScale)
+  updateAxis() {
+    this.xAxisGrid = d3.axisBottom(this.xScale)
       .ticks(d3.utcMinute, 60)
       .tickSize(-height)
       .tickFormat(function () { return null; });
 
-    this.group1 = this.svg.append("g")
-      .attr("class", "axis axis--grid")
-      .attr("transform", "translate(0," + height + ")");
-
-    this.group1.call(this.xAxis);
-
     this.xAxisLabel = d3.axisBottom(this.xScale)
       .ticks(d3.utcHour.every(3))
       .tickPadding(3);
+  }
+
+  initAxis() {
+    this.xScale
+      .domain(this.getAvailableTimeWindow());
+
+    this.updateAxis();
+
+    this.group1 = this.svg.append("g")
+      .attr("class", "axis axis--grid")
+      .attr("transform", "translate(0," + height + ")");
+    this.group1.call(this.xAxisGrid);
 
     this.svg
       .selectAll(".tick")
@@ -74,7 +85,6 @@ class TimeWindowSelector {
     this.group2 = this.svg.append("g")
       .attr("class", "axis axis--x")
       .attr("transform", "translate(0," + height + ")");
-
     this.group2.call(this.xAxisLabel);
 
     this.svg
@@ -102,7 +112,6 @@ class TimeWindowSelector {
     this.svg.append("g")
       .attr("class", "brush")
       .call(brush);
-
 
     /**
      * Gets the date being selected
@@ -147,8 +156,6 @@ class TimeWindowSelector {
       }
     }
 
-
-
     /**
      * Function called after brushing ended
      *
@@ -186,30 +193,22 @@ class TimeWindowSelector {
 
       d3.select(this).transition().call(d3.event.target.move, roundedSelectedDates.map(self.xScale));
     }
+  }
 
-    setTimeout(() => {
-      console.log("ici");
-      this.xScale.domain(this.getAvailableTimeWindow().map(d => addHourToDate(d, 2.4)));
+  updateHighledDateAndRedraw(date) {
+    this.highlightedDate = date;
 
-      this.xAxis = d3.axisBottom(this.xScale)
-        .ticks(d3.utcMinute, 60)
-        .tickSize(-height)
-        .tickFormat(function () { return null; });
+    this.xScale.domain(this.getAvailableTimeWindow().map(d => addHourToDate(d, 20.02)));
 
+    this.updateAxis();
 
-      this.xAxisLabel = d3.axisBottom(this.xScale)
-        .ticks(d3.utcHour.every(3))
-        .tickPadding(3);
+    this.group1
+      .transition()
+      .call(this.xAxisGrid);
 
-      this.group1
-        .transition()
-        .call(this.xAxis);
-
-      this.group2
-        .transition()
-        .call(this.xAxisLabel);
-    }, 1000);
-
+    this.group2
+      .transition().duration(1000)
+      .call(this.xAxisLabel);
   }
 }
 
