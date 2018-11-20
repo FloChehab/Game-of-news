@@ -110,7 +110,7 @@ class DataManager {
    * @memberof DataManager
    */
   updateTimeWindow(dates) {
-    const newData = dates.map((d) =>  this.get15MinData(d));
+    const newData = dates.map((d) => this.get15MinData(d));
     this.updateData(newData);
   }
 
@@ -120,10 +120,11 @@ class DataManager {
    * @memberof DataManager
    */
   init() {
-    const n = 30;//CONFIG.MAX_15_MIN_INTERVALS;
-    this.generator = dateGenerator(CONFIG.FIRST_FETCHABLE_GDELT_CSV_DATETIME);
-    const dates = [...Array(n).keys()].map(() => this.generator.next().value);
-    this.updateTimeWindow(dates);
+    // commented by Florent; not handled in the dashboard, would be inconsistent
+    // const n = 30;//CONFIG.MAX_15_MIN_INTERVALS;
+    // this.generator = dateGenerator(CONFIG.FIRST_FETCHABLE_GDELT_CSV_DATETIME);
+    // const dates = [...Array(n).keys()].map(() => this.generator.next().value);
+    // this.updateTimeWindow(dates);
   }
 
   /**
@@ -134,7 +135,7 @@ class DataManager {
    * @param {Date} endDate
    * @memberof DataManager
    */
-  selectDataBetweenDates(startDate, endDate) {
+  selectDataBetweenDatesAndUpdateViews(startDate, endDate) {
     const dates = datesBetween(startDate, endDate);
     this.updateTimeWindow(dates);
   }
