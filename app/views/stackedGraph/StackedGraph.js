@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import dataManagerInstance from "../../fetchData/DataManager";
+import _ from "lodash";
 
 class StackedGraph {
   constructor(context, numberOfEventsToDisplay) {
@@ -26,11 +27,11 @@ class StackedGraph {
   updateData() {
     const selectedIntervals = dataManagerInstance.data;
     selectedIntervals.then((allIntervals) => {
-        allIntervals.forEach((interval) => this.appendData(interval.data));
-        this.selectedDates = dataManagerInstance.dates;
-        this.processData();
-        this.updateViz();
-      });
+      allIntervals.forEach((interval) => this.appendData(interval.data));
+      this.selectedDates = dataManagerInstance.dates;
+      this.processData();
+      this.updateViz();
+    });
   }
 
   appendData(data) {
@@ -61,26 +62,24 @@ class StackedGraph {
 
     const area = d3.area()
       .curve(d3.curveBasis)
-      .x((d, i) => x(new Date(d.data.mentionDate)))
+      .x((d) => x(new Date(d.data.mentionDate)))
       .y((d) => y(d[0]))
       .y1((d) => y(d[1]));
 
-    //const z = d3.scaleOrdinal(d3.schemeSet1);
     const z = d3.interpolateSpectral;
 
     const axis = d3.axisBottom()
       .scale(x);
 
-    const path = this.svg.selectAll("path")
+    this.svg.selectAll("path")
       .data(layers)
       .enter().append("path")
         .attr("d", area)
-        //.attr("fill", (d, i) => z(i));
-        .attr("fill", (d, i) => z(Math.random()));
+        .attr("fill", () => z(Math.random()));
 
     this.svg.append("g")
-    .attr("transform", `translate(0, ${this.svg.attr("height")-30})`)//todo change magic number
-    .call(axis);
+      .attr("transform", `translate(0, ${this.svg.attr("height")-30})`)//todo change magic number
+      .call(axis);
   }
 
   processData() {
@@ -96,8 +95,8 @@ class StackedGraph {
     this.eventIDs = _(uniqueSourcesPerEvent)
       .chain()
       .groupBy("eventId")
-      .orderBy(((v, i) => _(v).map("mentionSourceName").size()), 'desc')
-      .map((v, i) => v[0].eventId)
+      .orderBy(((v) => _(v).map("mentionSourceName").size()), "desc")
+      .map((v) => v[0].eventId)
       .take(this.numberOfEventsToDisplay)
       .value();
 
@@ -109,7 +108,7 @@ class StackedGraph {
       .map((v, i) => {
         const d = {mentionDate: i};
         this.eventIDs.forEach((eid) => {
-          d[eid] = _(v).map("eventId").filter((v, i) => v == eid).size()
+          d[eid] = _(v).map("eventId").filter((v) => v == eid).size();
         });
         return d;
       }).value();

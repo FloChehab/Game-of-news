@@ -1,6 +1,6 @@
 import CONFIG from "../config";
 import fetchEventsMentions from "./fetchEventsMentions";
-import { dateGenerator } from "./utils/datesBetween";
+import datesBetween, { dateGenerator } from "./utils/datesBetween";
 
 
 /**
@@ -100,11 +100,11 @@ class DataManager {
    */
   async selectData(dates) {
     await Promise.all(dates.map((d) => this.get15MinData(d)))
-      .then((data) => { this.selectedData = data });
+      .then((data) => { this.selectedData = data; });
 
     return new Promise((success) => {
       this.selectedDates = dates;
-      return success(this.selectedData)
+      return success(this.selectedData);
     });
   }
 
