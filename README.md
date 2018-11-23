@@ -1,33 +1,22 @@
 [![Build Status](https://travis-ci.com/FloChehab/Game-of-news.svg?token=hZTHeNJUJ6Vdp9ym43T9&branch=master)](https://travis-ci.com/FloChehab/Game-of-news)
 
-Game of news
+WIP Game of news
 ===========
+
+This is a work in progress, more desription will be available soon.
+
+The current version of the app is available here: [https://flochehab.github.io/Game-of-news/](https://flochehab.github.io/Game-of-news/).
 
 ## Requirements
 You only need <b>node.js</b> pre-installed and you’re good to go.
 
-If you don’t want to work with lodash, just remove it from the node packages and the webpack config.
-
-
 ## Setup
-Install dependencies
+Clone and install dependencies
 ```sh
 $ npm install
 ```
 
 ## Development
-
-### Local GDELT API
-
-To replicate part of the GDELT API for devlopment purpose. Run the `fetch_extacts.py` script in the `data/extracts/` folder.
-
-```bash
-cd ./data/extracts
-python3 ./fetch_extracts.py
-```
-
-This will fetch approximetaly the first day of available data on the API.
-
 
 ### Running
 
