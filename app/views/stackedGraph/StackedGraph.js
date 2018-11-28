@@ -21,7 +21,7 @@ class StackedGraph {
         .attr("height", this.context.clientHeight)
         .attr("viewport", "0, 0, 100, 100");
 
-    this.updateData(dataManagerInstance.subscribe(this));
+    dataManagerInstance.subscribe(this);
   }
 
   resetData() {

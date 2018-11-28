@@ -1,12 +1,11 @@
 import MoveTo from "moveto";
 
-import fetchLastUpdateDateInstance from "./fetchData/FetchLastUpdateDate";
+import { fetchServerStatus } from "./fetchData/fetchData";
 import dataManagerInstance from "./fetchData/DataManager";
 import Dashboard from "./views/dashboard/Dashboard";
 import Story from "./Story";
 import "../assets/styles/index.scss";
 import "bootstrap/dist/css/bootstrap.min.css";
-// import { format } from "path";
 
 /**
  * Class the manages all the app
@@ -47,23 +46,19 @@ class App {
       moveTo.registerTrigger(trigger);
     }
 
-    fetchLastUpdateDateInstance.get()
-      .then(data => {
-        if (!data.success) {
-          p.innerText = "ERROR while starting API, please reload the page or contact admin";
-        } else {
-          for (let el of document.getElementsByClassName("API-REQUIRED")) {
-            el.setAttribute("style", ""); // remove the display None when everything is ready
-          }
-
-          dataManagerInstance.setLastFetchableDateTime(data.data);
-          p.remove();
-
-          const story = new Story();
-          story.init();
-          const dashboard = new Dashboard();
-          dashboard.init();
+    fetchServerStatus()
+      .then(() => {
+        for (let el of document.getElementsByClassName("API-REQUIRED")) {
+          el.setAttribute("style", ""); // remove the display None when everything is ready
         }
+        p.remove();
+        const story = new Story();
+        story.init();
+        const dashboard = new Dashboard();
+        dashboard.init();
+      })
+      .catch(() => {
+        p.innerText = "ERROR while starting the server API, please reload the page or contact admin";
       });
 
   }

@@ -11,8 +11,8 @@ import StackedGraph from "../stackedGraph/StackedGraph";
  */
 function setUpDateWindowSlector() {
   const datePicker = document.getElementById("dateTimeWindowSelector");
-  const first = dataManagerInstance.FIRST_FETCHABLE_GDELT_CSV_DATETIME,
-    last = dataManagerInstance.LAST_FETCHABLE_GDELT_CSV_DATETIME;
+  const first = dataManagerInstance.FIRST_AVAILABLE_GDELT_DATETIME,
+    last = dataManagerInstance.LAST_AVAILABLE_GDELT_DATETIME;
 
   datePicker.setAttribute("min", dateToStrIso(first));
   datePicker.setAttribute("max", dateToStrIso(last));

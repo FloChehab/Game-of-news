@@ -152,12 +152,12 @@ class TimeWindowSelector {
       const roundedSelectedDates = selectedDates.map((date) => nearestQuarterDate(date));
       const nq = numberOfQuartersBetween(...roundedSelectedDates);
 
-      if (nq > CONFIG.MAX_15_MIN_INTERVALS && !isRectMoving()) {
+      if (nq > CONFIG.MAX_NB_HOURS_GBQ_QUERY && !isRectMoving()) {
         // we limit the number of intervals that can be fetch
         d3.select(this).call(d3.event.target.move, self.lastSelectionBrushing.map(self.xScale));
         setSelectionClass("out-of-range");
       } else {
-        if (roundedSelectedDates[0].getTime() < dataManagerInstance.FIRST_FETCHABLE_GDELT_CSV_DATETIME.getTime() ||
+        if (roundedSelectedDates[0].getTime() < dataManagerInstance.FIRST_AVAILABLE_GDELT_DATETIME.getTime() ||
           roundedSelectedDates[1].getTime() > dataManagerInstance.LAST_FETCHABLE_GDELT_CSV_DATETIME.getTime()) {
           d3.select(this).call(d3.event.target.move, self.lastSelectionBrushing.map(self.xScale));
           setSelectionClass("out-of-range");

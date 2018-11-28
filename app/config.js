@@ -1,37 +1,15 @@
-import dateFromStrDateTime from "./fetchData/utils/dateFromStrDateTime";
+const LIVE_API = "https://gdelt-proxy-epfl-data-viz.herokuapp.com/";
 
-const LIVE_API = "https://gdelt-proxy-epfl-data-viz.herokuapp.com/proxy/gdeltv2/";
+const todayTimestamp = new Date().getTime();
+const yesterday = new Date(todayTimestamp - (3600 * 24 * 1000));
 
 let CONFIG = {
-  FIRST_FETCHABLE_GDELT_CSV_DATETIME: dateFromStrDateTime("20150218224500"),
-  MAX_15_MIN_INTERVALS: 40,
-  END_POINT_LIVE_GDELT_DATA: "/data/extracts/",
+  FIRST_AVAILABLE_GDELT_DATETIME: new Date(Date.UTC(2015, 1, 18, 22, 45, 0, 0)),
+  // For simplicity we set the max querrying time to 24 houts earlier
+  LAST_AVAILABLE_GDELT_DATETIME: yesterday,
+  MAX_NB_HOURS_GBQ_QUERY: 40,
+  END_POINT_LIVE_GDELT_DATA: "http://0.0.0.0:8000/",
   //"END_POINT_LIVE_GDELT_DATA": LIVE_API,
-  BASE_END_POINT_GDELT_LAST_UPDATE_CSV: "lastupdate-translation.txt",
-  EVENTS_CSV_END_NAME: ".translation.export.CSV.zip",
-  MENTIONS_CSV_END_NAME: ".translation.mentions.CSV.zip",
-  MENTIONS_CSV_FILTER: [
-    "eventId",
-    "dateEventAdded",
-    "mentionDate",
-    "mentionType",
-    "mentionSourceName",
-    "mentionId",
-    "confidence",
-    "mentionDocTone",
-  ],
-  EVENTS_CSV_FILTER: [
-    "eventId",
-    "eventDate",
-    "actor1Code",
-    "actor1Name",
-    "actor1CountryCode",
-    "actor2Code",
-    "actor2Name",
-    "actor2CountryCode",
-    "confidence",
-    "tone",
-  ]
 };
 
 try {
