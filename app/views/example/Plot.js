@@ -7,7 +7,7 @@ import { dateGenerator } from "../../fetchData/utils/datesBetween";
 class Plot {
   constructor() {
     this.data = Array();
-    this.generator = dateGenerator(CONFIG.FIRST_FETCHABLE_GDELT_CSV_DATETIME);
+    this.generator = dateGenerator(CONFIG.FIRST_AVAILABLE_GDELT_DATETIME);
   }
 
   init() {

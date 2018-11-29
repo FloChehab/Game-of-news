@@ -21,7 +21,7 @@ class StackedGraph {
         .attr("height", this.context.clientHeight)
         .attr("viewport", "0, 0, 100, 100");
 
-    this.updateData(dataManagerInstance.subscribe(this));
+    dataManagerInstance.subscribe(this);
   }
 
   resetData() {
@@ -31,14 +31,10 @@ class StackedGraph {
   }
 
   updateData(data) {
-    const selectedIntervals = data;
-    Promise.all(selectedIntervals).then((allIntervals) => {
-      this.resetData();
-      allIntervals.forEach((interval) => this.appendData(interval.data));
-      this.updateSelectedDates();
-      this.processData();
-      this.updateViz();
-    });
+    this.rawData = data;
+    this.updateSelectedDates();
+    this.processData();
+    this.updateViz();
   }
 
   appendData(data) {

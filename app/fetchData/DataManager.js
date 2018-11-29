@@ -1,7 +1,9 @@
 import CONFIG from "../config";
-import fetchEventsMentions from "./fetchEventsMentions";
-import datesBetween, { dateGenerator } from "./utils/datesBetween";
-
+import {
+  fetchQueryResult,
+  fetchGBQServerStatus,
+  fetchDataset
+} from "./fetchData";
 
 /**
  * Class for smartly handling all the data in the app.
@@ -10,68 +12,94 @@ import datesBetween, { dateGenerator } from "./utils/datesBetween";
  */
 class DataManager {
   constructor() {
-    this.max15MinIntervals = CONFIG.MAX_15_MIN_INTERVALS;
-    this.intervalData = new Map();
-    this.FIRST_FETCHABLE_GDELT_CSV_DATETIME = CONFIG.FIRST_FETCHABLE_GDELT_CSV_DATETIME;
-    this.LAST_FETCHABLE_GDELT_CSV_DATETIME = false;
+    this.datasetsStorage = new Map();
 
-    // TODO remove this when not nessary anymore
-    this.generator = dateGenerator(CONFIG.FIRST_FETCHABLE_GDELT_CSV_DATETIME);
+    this.FIRST_AVAILABLE_GDELT_DATETIME = CONFIG.FIRST_AVAILABLE_GDELT_DATETIME;
+    this.LAST_AVAILABLE_GDELT_DATETIME = CONFIG.LAST_AVAILABLE_GDELT_DATETIME;
+    this.isGBQAvailable = false;
+    // Check GBQ availability as soon as the app is lunched
+    this.checkGBQAvailability();
 
-    this.currentData = Array();
     // Subscribed views
     this.subscribedViews = Array();
   }
 
-  setLastFetchableDateTime(date) { this.LAST_FETCHABLE_GDELT_CSV_DATETIME = date; }
-  getMax15MinIntervals() { return this.max15MinIntervals; }
-  setMax15MinIntervals(val) { this.max15MinIntervals = val; }
-
-  store(key, data) {
-    this.intervalData.set(key, { data, storedOn: new Date() });
+  checkGBQAvailability() {
+    fetchGBQServerStatus()
+      .then(data => this.isGBQAvailable = data.active);
   }
 
   /**
-   * Check that the current size of the intervalData map
-   * is not too big, for memory concerns.
+   * Stores a dataset in the memory
    *
-   * If the map is too big, then the last used value is removed.
-   *
+   * @param {string} name
+   * @param {object} data
    * @memberof DataManager
    */
-  checkSize() {
-    const size = this.intervalData.size;
-    let minStoredOn = { date: new Date(), key: null };
-    if (size > this.max15MinIntervals) {
-      // clean for memory limitations
-      for (const [key, { date }] of this.intervalData) {
-        if (date < minStoredOn.date) {
-          minStoredOn.date = date;
-          minStoredOn.key = key;
-        }
+  storeDataset(name, data) {
+    this.datasetsStorage.set(name, data);
+  }
+
+  /**
+   * Function to prefetch a dataset.
+   *
+   * @param {string} name
+   * @param {function} [callback=() => { }] function that should have an argument for the data that was fetch
+   * @memberof DataManager
+   */
+  preFetchDataset(name, callback = () => { }) {
+    fetchDataset(name)
+      .then(data => {
+        this.storeDataset(name, data);
+        callback(data);
+      });
+  }
+
+  /**
+   * Prefetch all datasets declared in the CONFIG file
+   * All datasets are recursively / successively fetched.
+   * @memberof DataManager
+   */
+  preFetchAllDatasets() {
+    for (const dataset of CONFIG.PRE_FETCHED_DATASETS) {
+      if (!this.datasetsStorage.has(dataset)) {
+        this.preFetchDataset(dataset, () => this.preFetchAllDatasets());
+
+        // Fetch only one at a time.
+        return;
       }
-      this.intervalData.delete(minStoredOn.key);
     }
   }
 
   /**
-   * Return a Promise with the data (mentions merged with events) for a given date.
+   *  If needed fetch a dataset or retreive it from an already fetch dataset.
+   *  The views are then updated with the relevant data
    *
-   * @param {Date} date
-   * @returns Promise({success: bool, data: Array})
+   * @param {string} name Dataset name
    * @memberof DataManager
    */
-  async get15MinData(date) {
-    if (this.intervalData.has(date)) {
-      const data = this.intervalData.get(date).data;
-      this.store(date, data); // update storing date
-      return new Promise((success) => success(data));
+  getDatasetAndUpdateViews(name) {
+    if (this.datasetsStorage.has(name)) {
+      this.updateViewsData(this.datasetsStorage.get(name));
     } else {
-      const data = await fetchEventsMentions(date);
-      this.checkSize();
-      this.store(date, data);
-      return new Promise((success) => success(data));
+      this.preFetchDataset(name, (data) => this.updateViewsData(data));
     }
+  }
+
+
+  /**
+   * Makes the Google Big Querry request, and send the data to the views
+   *
+   * @param {object} queryParameters
+   * @memberof DataManager
+   */
+  getQueryDatasetAndUpdateViews(queryParameters) {
+    if (this.isGBQAvailable !== true) {
+      throw new Error("Server can't make request to Google Big Querry.");
+    }
+
+    fetchQueryResult(queryParameters)
+      .then((data) => this.updateViewsData(data));
   }
 
   /**
@@ -79,7 +107,6 @@ class DataManager {
    * Only views that have an updateData function can be subscribed.
    *
    * @param {Object} view The view to subscribe.
-   * @returns {Array[Promise]} The currently selected data.
    * @memberof DataManager
    */
   subscribe(view) {
@@ -89,76 +116,21 @@ class DataManager {
     if (!this.subscribedViews.includes(view)) {
       this.subscribedViews.push(view);
     }
-    return this.currentData;
   }
 
   /**
    * Updates selected data and propagates changes to subscribed views.
    *
-   * @param {Array[Promise]} newData
+   * @param {object} data
    * @memberof DataManager
    */
-  updateData(newData) {
-    this.currentData = newData;
-    this.subscribedViews.forEach((v) => v.updateData(this.currentData));
+  updateViewsData(data) {
+    this.subscribedViews.forEach((v) => v.updateData(data));
   }
 
-  /**
-   * Updates selected data based on a new time window.
-   *
-   * @param {Array[Date]} dates The 15-min intervals that comprise the new time window.
-   * @memberof DataManager
-   */
-  updateTimeWindow(dates) {
-    const newData = dates.map((d) => this.get15MinData(d));
-    this.updateData(newData);
-  }
-
-  /**
-   * Initializes selected data based on a default time window.
-   *
-   * @memberof DataManager
-   */
-  init() {
-    // commented by Florent; not handled in the dashboard, would be inconsistent
-    // const n = 30;//CONFIG.MAX_15_MIN_INTERVALS;
-    // this.generator = dateGenerator(CONFIG.FIRST_FETCHABLE_GDELT_CSV_DATETIME);
-    // const dates = [...Array(n).keys()].map(() => this.generator.next().value);
-    // this.updateTimeWindow(dates);
-  }
-
-  /**
-   * Updates selected data based on a time window defined by specified start and end dates.
-   * TODO: May be irrelevant depending on how Florent has implemented the time window selector.
-   *
-   * @param {Date} startDate
-   * @param {Date} endDate
-   * @memberof DataManager
-   */
-  selectDataBetweenDatesAndUpdateViews(startDate, endDate) {
-    const dates = datesBetween(startDate, endDate);
-    this.updateTimeWindow(dates);
-  }
-
-  /**
-   * Fetch a sample of data from the first available time interval.
-   *
-   * @param {number} n number of 15 minutes events you want to fetch
-   * @returns {Array[Promise]} A list of Promise containing the fetched data wrapped in a succcess object.
-   * @memberof DataManager
-   */
-  getSampleData(n) {
-    if (n > CONFIG.MAX_15_MIN_INTERVALS) {
-      throw new Error(`${n} is too big`);
-    }
-
-    this.generator = dateGenerator(CONFIG.FIRST_FETCHABLE_GDELT_CSV_DATETIME);
-    return [...Array(n).keys()].map(() => this.get15MinData(this.generator.next().value));
-  }
 }
 
 const dataManagerInstance = new DataManager();
-dataManagerInstance.init(); //Already fetch some default data.
 // We export only the instance, we shouldn't use multiple instances of this.
 // No need to export the class.
 export default dataManagerInstance;
