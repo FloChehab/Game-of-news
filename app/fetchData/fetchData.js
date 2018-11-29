@@ -32,7 +32,7 @@ export async function fetchQueryResult(queryParameters) {
  * @returns The data corresponding to the dataset
  */
 export async function fetchDataset(datasetName) {
-  const data = await fetch(CONFIG.END_POINT_LIVE_GDELT_DATA + "datasets/" + datasetName);
+  const data = await fetch(CONFIG.END_POINT_LIVE_GDELT_DATA + "dataset/" + datasetName);
   return await data.json();
 }
 

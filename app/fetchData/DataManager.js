@@ -1,8 +1,8 @@
 import CONFIG from "../config";
 import {
-  // fetchDataset,
   fetchQueryResult,
-  fetchGBQServerStatus
+  fetchGBQServerStatus,
+  fetchDataset
 } from "./fetchData";
 
 /**
@@ -12,14 +12,13 @@ import {
  */
 class DataManager {
   constructor() {
-    this.datasets = new Map();
+    this.datasetsStorage = new Map();
 
     this.FIRST_AVAILABLE_GDELT_DATETIME = CONFIG.FIRST_AVAILABLE_GDELT_DATETIME;
     this.LAST_AVAILABLE_GDELT_DATETIME = CONFIG.LAST_AVAILABLE_GDELT_DATETIME;
     this.isGBQAvailable = false;
     // Check GBQ availability as soon as the app is lunched
     this.checkGBQAvailability();
-    this.currentData = Object();
 
     // Subscribed views
     this.subscribedViews = Array();
@@ -31,22 +30,67 @@ class DataManager {
   }
 
   /**
-   * TODO
-   * Not yet used
+   * Stores a dataset in the memory
    *
-   * @param {*} key
-   * @param {*} data
+   * @param {string} name
+   * @param {object} data
    * @memberof DataManager
    */
-  store(key, data) {
-    this.datasets.set(key, data);
+  storeDataset(name, data) {
+    this.datasetsStorage.set(name, data);
+  }
+
+  /**
+   * Function to prefetch a dataset.
+   *
+   * @param {string} name
+   * @param {function} [callback=() => { }] function that should have an argument for the data that was fetch
+   * @memberof DataManager
+   */
+  preFetchDataset(name, callback = () => { }) {
+    fetchDataset(name)
+      .then(data => {
+        this.storeDataset(name, data);
+        callback(data);
+      });
+  }
+
+  /**
+   * Prefetch all datasets declared in the CONFIG file
+   * All datasets are recursively / successively fetched.
+   * @memberof DataManager
+   */
+  preFetchAllDatasets() {
+    for (const dataset of CONFIG.PRE_FETCHED_DATASETS) {
+      if (!this.datasetsStorage.has(dataset)) {
+        this.preFetchDataset(dataset, () => this.preFetchAllDatasets());
+
+        // Fetch only one at a time.
+        return;
+      }
+    }
+  }
+
+  /**
+   *  If needed fetch a dataset or retreive it from an already fetch dataset.
+   *  The views are then updated with the relevant data
+   *
+   * @param {string} name Dataset name
+   * @memberof DataManager
+   */
+  getDatasetAndUpdateViews(name) {
+    if (this.datasetsStorage.has(name)) {
+      this.updateViewsData(this.datasetsStorage.get(name));
+    } else {
+      this.preFetchDataset(name, (data) => this.updateViewsData(data));
+    }
   }
 
 
   /**
    * Makes the Google Big Querry request, and send the data to the views
    *
-   * @param {*} queryParameters
+   * @param {object} queryParameters
    * @memberof DataManager
    */
   getQueryDatasetAndUpdateViews(queryParameters) {
@@ -55,7 +99,7 @@ class DataManager {
     }
 
     fetchQueryResult(queryParameters)
-      .then(data => this.updateData(data));
+      .then((data) => this.updateViewsData(data));
   }
 
   /**
@@ -63,7 +107,6 @@ class DataManager {
    * Only views that have an updateData function can be subscribed.
    *
    * @param {Object} view The view to subscribe.
-   * @returns {Array[Promise]} The currently selected data.
    * @memberof DataManager
    */
   subscribe(view) {
@@ -73,18 +116,16 @@ class DataManager {
     if (!this.subscribedViews.includes(view)) {
       this.subscribedViews.push(view);
     }
-    return this.currentData;
   }
 
   /**
    * Updates selected data and propagates changes to subscribed views.
    *
-   * @param {Array[Promise]} newData
+   * @param {object} data
    * @memberof DataManager
    */
-  updateData(newData) {
-    this.currentData = newData;
-    this.subscribedViews.forEach((v) => v.updateData(this.currentData));
+  updateViewsData(data) {
+    this.subscribedViews.forEach((v) => v.updateData(data));
   }
 
 }

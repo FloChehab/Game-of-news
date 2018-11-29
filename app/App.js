@@ -48,6 +48,8 @@ class App {
 
     fetchServerStatus()
       .then(() => {
+        dataManagerInstance.preFetchAllDatasets();
+
         for (let el of document.getElementsByClassName("API-REQUIRED")) {
           el.setAttribute("style", ""); // remove the display None when everything is ready
         }
