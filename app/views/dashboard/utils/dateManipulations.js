@@ -1,15 +1,15 @@
-const mins15inMs = 15 * 60 * 1000; // 15 minutes in milliseconds
+const oneHourInMs = 60 * 60 * 1000; // 15 minutes in milliseconds
 
 /**
- * Funtion that rounds a date to the nearest quarter of time.
+ * Function that rounds a date to the nearest hour.
  *
  * @export
  * @param {Date} date Date to round
- * @param {function} roundingMethod What methods is used to round to the nearest quarter.
+ * @param {function} roundingMethod What methods is used to round to the nearest hour.
  * @returns {Date} The reounded date.
  */
-export function nearestQuarterDate(date, roundingMethod = Math.round) {
-  return new Date(roundingMethod(date.getTime() / mins15inMs) * mins15inMs);
+export function nearestHourDate(date, roundingMethod = Math.round) {
+  return new Date(roundingMethod(date.getTime() / oneHourInMs) * oneHourInMs);
 }
 
 
@@ -33,8 +33,8 @@ export function absDelayBetweenDates(date1, date2) {
  * @param {Date} date2
  * @returns {number}
  */
-export function numberOfQuartersBetween(date1, date2) {
-  return absDelayBetweenDates(date1, date2) / mins15inMs;
+export function numberOfHoursBetween(date1, date2) {
+  return absDelayBetweenDates(date1, date2) / oneHourInMs;
 }
 
 

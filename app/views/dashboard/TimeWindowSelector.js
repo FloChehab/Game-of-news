@@ -2,8 +2,8 @@ import * as d3 from "d3";
 import dataManagerInstance from "../../fetchData/DataManager";
 import "../../../assets/styles/TimeWindowSelector.scss";
 import {
-  nearestQuarterDate,
-  numberOfQuartersBetween,
+  nearestHourDate,
+  numberOfHoursBetween,
   absDelayBetweenDates,
   datesAreEqual,
   addHourToDate,
@@ -89,7 +89,7 @@ class TimeWindowSelector {
     this.xScale.domain(newDomain);
 
     this.xAxisGrid = d3.axisBottom(this.xScale)
-      .ticks(d3.utcMinute, 60)
+      .ticks(d3.utcHour, 1)
       .tickSize(-height)
       .tickFormat(function () { return null; });
 
@@ -149,16 +149,16 @@ class TimeWindowSelector {
       const selectedDates = getSelectedDates();
       if (selectedDates === false) return;
 
-      const roundedSelectedDates = selectedDates.map((date) => nearestQuarterDate(date));
-      const nq = numberOfQuartersBetween(...roundedSelectedDates);
+      const roundedSelectedDates = selectedDates.map((date) => nearestHourDate(date));
+      const nh = numberOfHoursBetween(...roundedSelectedDates);
 
-      if (nq > CONFIG.MAX_NB_HOURS_GBQ_QUERY && !isRectMoving()) {
+      if (nh > CONFIG.MAX_NB_HOURS_GBQ_QUERY && !isRectMoving()) {
         // we limit the number of intervals that can be fetch
         d3.select(this).call(d3.event.target.move, self.lastSelectionBrushing.map(self.xScale));
         setSelectionClass("out-of-range");
       } else {
         if (roundedSelectedDates[0].getTime() < dataManagerInstance.FIRST_AVAILABLE_GDELT_DATETIME.getTime() ||
-          roundedSelectedDates[1].getTime() > dataManagerInstance.LAST_FETCHABLE_GDELT_CSV_DATETIME.getTime()) {
+          roundedSelectedDates[1].getTime() > dataManagerInstance.LAST_AVAILABLE_GDELT_DATETIME.getTime()) {
           d3.select(this).call(d3.event.target.move, self.lastSelectionBrushing.map(self.xScale));
           setSelectionClass("out-of-range");
         } else {
@@ -182,7 +182,7 @@ class TimeWindowSelector {
       const selectedDates = getSelectedDates();
       if (selectedDates === false) return;
 
-      let roundedSelectedDates = selectedDates.map((date) => nearestQuarterDate(date));
+      let roundedSelectedDates = selectedDates.map((date) => nearestHourDate(date));
 
       if (self.lastSelection !== false) {
         // If the delay between the two han't change, assume the two limits
@@ -192,7 +192,7 @@ class TimeWindowSelector {
             currD1 = roundedSelectedDates[0];
           const roundingOperator = currD1 < prevD1 ? Math.floor : Math.ceil;
           roundedSelectedDates = selectedDates.map(
-            (date) => nearestQuarterDate(date, roundingOperator)
+            (date) => nearestHourDate(date, roundingOperator)
           );
         }
       }
@@ -200,7 +200,7 @@ class TimeWindowSelector {
       // handle the fact that sometime two dates can be the same
       if (datesAreEqual(...roundedSelectedDates)) {
         const d1 = roundedSelectedDates[1];
-        roundedSelectedDates[1] = nearestQuarterDate(
+        roundedSelectedDates[1] = nearestHourDate(
           new Date(d1.getTime() + 1), Math.ceil);
       }
 
@@ -212,7 +212,10 @@ class TimeWindowSelector {
 
   updateSelectionnedDateAndTellDataManager(dates) {
     this.lastSelection = dates;
-    dataManagerInstance.selectDataBetweenDatesAndUpdateViews(...dates);
+    dataManagerInstance.getQueryDatasetAndUpdateViews({
+      date_begin: dates[0].toJSON(),
+      date_end: dates[1].toJSON()
+    });
   }
 
   updateHighledDateAndRedraw(date) {
