@@ -4,6 +4,23 @@ import { dateToStrIso } from "./utils/dateManipulations";
 //import StackedGraph from "../stackedGraph/StackedGraph";
 import CONFIG from "../../config";
 
+
+function initSelectDataset() {
+  let select = document.getElementById("dashboardSelectDataset");
+  for (const dataset of CONFIG.PRE_FETCHED_DATASETS) {
+    const option = document.createElement("option");
+    option.text = dataset + "  | TODO nicer text";
+    option.value = dataset;
+    select.add(option);
+  }
+
+  select.onchange = () => {
+    dataManagerInstance.getDatasetAndUpdateViews(select.value);
+  };
+
+}
+
+
 /**
  * Function that sets the datePicker field to the correct value + with the correct time limit.
  * It also returns the selected date.
@@ -26,6 +43,7 @@ class Dashboard {
   constructor() { }
 
   init() {
+    initSelectDataset();
     const highlightedDate = setUpDateWindowSlector();
     new TimeWindowSelector(highlightedDate).init();
 

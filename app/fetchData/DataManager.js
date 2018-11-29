@@ -26,7 +26,18 @@ class DataManager {
 
   checkGBQAvailability() {
     fetchGBQServerStatus()
-      .then(data => this.isGBQAvailable = data.active);
+      .then(data => {
+        if (data.active === true) {
+          this.isGBQAvailable = true;
+          for (let el of document.getElementsByClassName("API-GDELT-REQUIRED")) {
+            if (el.getAttribute("data-required") === "true") {
+              el.setAttribute("style", "");
+            } else {
+              el.setAttribute("style", "display: none;");
+            }
+          }
+        }
+      });
   }
 
   /**
