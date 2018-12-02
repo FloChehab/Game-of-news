@@ -1,6 +1,6 @@
 import {
-  nearestQuarterDate,
-  numberOfQuartersBetween,
+  nearestHourDate,
+  numberOfHoursBetween,
   addHourToDate,
   roundDateTimeToDay
 } from "../utils/dateManipulations";
@@ -18,28 +18,26 @@ function expectDateEquals(date1, date2) {
 
 test("nearest quarter date rounding", () => {
   const d1 = new Date(2018, 10, 2, 12, 10),
-    d1Target = new Date(2018, 10, 2, 12, 15),
+    d1Target = new Date(2018, 10, 2, 12, 0),
     d2 = new Date(2018, 10, 2, 12, 20),
-    d2Target = new Date(2018, 10, 2, 12, 15),
-    d3 = new Date(2018, 10, 2, 12, 30),
-    d3Target = new Date(2018, 10, 2, 12, 30);
+    d2Target = new Date(2018, 10, 2, 12, 0),
+    d3 = new Date(2018, 10, 2, 12, 34),
+    d3Target = new Date(2018, 10, 2, 13, 0);
 
-  expectDateEquals(nearestQuarterDate(d1), d1Target);
-  expectDateEquals(nearestQuarterDate(d2), d2Target);
-  expectDateEquals(nearestQuarterDate(d3), d3Target);
+  expectDateEquals(nearestHourDate(d1), d1Target);
+  expectDateEquals(nearestHourDate(d2), d2Target);
+  expectDateEquals(nearestHourDate(d3), d3Target);
 });
 
 
 test("number of quarters between dates", () => {
-  const d1 = new Date(2018, 10, 2, 12, 15),
-    d2 = new Date(2018, 10, 2, 12, 15),
-    d3 = new Date(2018, 10, 2, 12, 30),
-    d4 = new Date(2018, 10, 2, 12, 45);
+  const d1 = new Date(2018, 10, 2, 10, 0),
+    d2 = new Date(2018, 10, 2, 12, 0),
+    d3 = new Date(2018, 10, 2, 13, 0);
 
-  expect(numberOfQuartersBetween(d1, d2)).toBe(0);
-  expect(numberOfQuartersBetween(d1, d3)).toBe(1);
-  expect(numberOfQuartersBetween(d1, d4)).toBe(2);
-  expect(numberOfQuartersBetween(d4, d1)).toBe(2);
+  expect(numberOfHoursBetween(d1, d1)).toBe(0);
+  expect(numberOfHoursBetween(d1, d2)).toBe(2);
+  expect(numberOfHoursBetween(d1, d3)).toBe(3);
 });
 
 test("Round datetime to date", () => {
