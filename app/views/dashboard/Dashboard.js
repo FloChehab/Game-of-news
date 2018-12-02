@@ -3,6 +3,7 @@ import dataManagerInstance from "../../fetchData/DataManager";
 import { dateToStrIso } from "./utils/dateManipulations";
 //import StackedGraph from "../stackedGraph/StackedGraph";
 import CONFIG from "../../config";
+import Graph from "../graph/Graph";
 
 
 function initSelectDataset() {
@@ -19,7 +20,6 @@ function initSelectDataset() {
   };
 
 }
-
 
 /**
  * Function that sets the datePicker field to the correct value + with the correct time limit.
@@ -52,12 +52,17 @@ class Dashboard {
     stackedGraphContext.setAttribute("id", "stackedGraph");
     stackedGraphContext.setAttribute("style", "height: 600px");
     document.getElementById("dashboard").appendChild(stackedGraphContext);
-    // new StackedGraph(stackedGraphContext, 7).init();
-
 
     // Fetch some sample data on click
     const btn = document.getElementById("btn-get-sample-dataset");
     btn.onclick = () => dataManagerInstance.getDatasetAndUpdateViews(CONFIG.PRE_FETCHED_DATASETS[0]);
+    // new StackedGraph(stackedGraphContext, 7).init();
+
+    const graphContext = document.createElement("div");
+    graphContext.setAttribute("id","graph");
+    graphContext.style.setProperty("height","600px");
+    document.getElementById("dashboard").appendChild(graphContext);
+    new Graph(graphContext).init();
   }
 }
 
