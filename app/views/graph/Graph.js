@@ -1,37 +1,111 @@
 import cytoscape from "cytoscape";
+import cola from "cytoscape-cola";
+
 // import _ from "lodash";
 import dataManagerInstance from "../../fetchData/DataManager";
 // import { runInThisContext } from "vm";
 
+
+/**
+ * Function that generate a map, with for each node you have a list of
+ * [nodeConnected, {meanToneDist, eventsSharedCount}]
+ *
+ * @param {Array[string]} nodes
+ * @param {Object} edgesInfo
+ * @returns {Map}
+ */
+function edgesToMap(nodes, edgesInfo) {
+  // Convert nodes to map for better performances
+  let nodesMap = new Map();
+  nodes.forEach(name => {
+    nodesMap.set(name, true);
+  });
+
+  // Create the edgesMap and initialize it
+  let edgesMap = new Map();
+  nodes.forEach(name => {
+    edgesMap.set(name, Array());
+  });
+
+  // Function to add 2 possible edges to edgesMap
+  function addEdges(node1, node2, meanToneDist, eventsSharedCount) {
+    // we do it for both nodes
+    let cur1 = edgesMap.get(node1);
+    cur1.push([node2, { meanToneDist, eventsSharedCount }]);
+    edgesMap.set(node1, cur1);
+
+    let cur2 = edgesMap.get(node2);
+    cur2.push([node1, { meanToneDist, eventsSharedCount }]);
+    edgesMap.set(node2, cur2);
+  }
+
+  // Iterate through the data to build the info we need
+  for (const source1 in edgesInfo) {
+    if (nodesMap.has(source1)) {
+      for (const source2 in edgesInfo[source1]) {
+        if (nodesMap.has(source2)) {
+          // here we can work
+          const { meanToneDist, eventsSharedCount } = edgesInfo[source1][source2];
+          addEdges(source1, source2, meanToneDist, eventsSharedCount);
+        }
+      }
+    }
+  }
+
+  // finally we sort all possible edges for each nodes
+  nodes.forEach(source => {
+    let cur = edgesMap.get(source);
+    edgesMap.set(source, Array.sort(
+      cur,
+      (a, b) => b[1].eventsSharedCount - a[1].eventsSharedCount
+    ));
+  });
+
+  return edgesMap;
+}
+
+
+
 class Graph {
   constructor(context) {
+
     this.context = context;
     this.rawData = Array();
     this.connections = {};
-    this.nodes = Array();
-    this.edges = Array();
+    this.elements = Array();
+
+    // Parameters for the graph
+    this.config = {
+      MAX_NODE: 13, // max = 100 !
+      BEST_N_EDGES: 3,
+    };
   }
 
   init() {
     dataManagerInstance.subscribe(this);
 
-    this.cy = cytoscape({
+    this.cy = cytoscape.use(cola)({
       container: this.context,
       style: [
         {
           selector: "node",
           style: {
             "background-color": "#666",
-            "label": "data(id)"
+            "label": "data(id)",
+            "width": "data(scale)",
+            "height": "data(scale)",
+            "font-size": "data(scale)"
           }
         },
         {
           selector: "edge",
           style: {
-            "width": 10,
-            "line-color": "#ccc",
-            "target-arrow-color": "#ccc",
-            "target-arrow-shape": "triangle"
+            "width": "data(width)",
+            "line-color": "data(color)",
+            //"target-arrow-color": "#ccc",
+            //"target-arrow-shape": "triangle",
+            "curve-style": "unbundled-bezier",
+            //'control-point-things': xyz
           }
         }
       ],
@@ -40,122 +114,92 @@ class Graph {
         rows: 1
       }
     });
-
   }
+
 
   updateData(data) {
     const { graph } = data;
-    this.processData(graph["mappingIdSource"], graph["data"]);
+    this.processData(graph.nodes, graph.edgesData, graph.other);
     this.updateViz();
   }
-  // appendData(data) {
-  //   this.rawData.push.apply(this.rawData, data);
-  // }
 
-  processData(sources, info) {
-    // const bySource = _(this.rawData)
-    //   .chain()
-    //   .groupBy("mentionSourceName")
-    //   .value();
 
-    // const byEvent  = _(this.rawData)
-    //   .chain()
-    //   .groupBy("eventId")
-    //   .value();
+  processData(nodesIds, edgesInfo, otherInfos) {
+    this.elements = Array();
 
-    // _.forEach(Object.keys(bySource), (lkey) => {
-    //   this.connections[lkey] = {};
-    // });
+    // const { maxToneDist, maxSharedEventsCount } = otherInfos;
+    const { maxSharedEventsCount } = otherInfos;
 
-    // _.forEach(Object.keys(bySource), (lkey) => {
-    //   _.forEach(bySource[lkey],(lmen) => {
-    //     const rmentions = _.filter(byEvent[lmen.eventId],e=>e.mentionSourceName > lkey);
-    //     _.forEach(rmentions, (rmen) => {
-    //       this.connections[lmen.mentionSourceName][rmen.mentionSourceName] =
-    //           (this.connections[lmen.mentionSourceName][rmen.mentionSourceName]) || [];
-    //       this.connections[rmen.mentionSourceName][lmen.mentionSourceName] =
-    //           (this.connections[rmen.mentionSourceName][lmen.mentionSourceName]) || [];
+    // handling nodes
+    // Take the top nodes and limit to MAX_NODE
+    let nodes = Array.sort(
+      Object.entries(nodesIds),
+      (a, b) => b[1] - a[1]
+    );
+    nodes = nodes.slice(0, this.config.MAX_NODE);
 
-    //       this.connections[lmen.mentionSourceName][rmen.mentionSourceName].push(rmen);
-    //       this.connections[rmen.mentionSourceName][lmen.mentionSourceName].push(rmen);
-    //     });
-    //   });
-    // });
-
-    this.nodes = [];
-    for (const key in sources) {
-      this.nodes.push({ id: key });
-    }
-
-    this.edges = [];
-    for (const eventId in info) {
-      // console.log(this.edges.length)
-      if (this.edges.length > 10000) break; // TODO better
-      for (const source1 in info[eventId]) {
-        if (this.edges.length > 10000) break; // TODO better
-        for (const source2 in info[eventId]) {
-          if (source1 != source2) {
-            this.edges.push({
-              id: eventId + source1 + source2,
-              source: source1,
-              target: source2
-            });
-          }
+    nodes.forEach(el => {
+      this.elements.push({
+        group: "nodes", data: {
+          id: el[0],
+          scale: 10 * el[1] / maxSharedEventsCount
         }
+      });
+    });
+
+    // Handling edges
+    function buildId(source1, source2) {
+      let s1 = source1, s2 = source2;
+      if (source1 > source2){
+        s1 = source2, s2 = source1;
       }
+      return `edge:%${s1}%${s2}`;
     }
 
-    // console.log(this.edges);
-    // this.nodes = _(this.connections)
-    //   .chain()
-    //   .map((neighborhood, node) => ({ id: node }))
-    //   .value();
+    const nodesNames = nodes.map(el => el[0]);
+    const edgesMap = edgesToMap(nodesNames, edgesInfo);
+    const edgeMemory = new Map();
 
-    // this.edges = _(this.connections)
-    //   .chain()
-    //   .map((neighborhood, node) => {
-    //     return _.map(neighborhood, (mentions, name) => {
-    //       return ({
-    //         id: node + "_" + name,
-    //         source: node,
-    //         target: name
-    //       });
-    //     });
-    //   })
-    //   .flatten()
-    //   .value();
+    nodesNames.forEach(source1 => {
+      const possibleEdges = edgesMap.get(source1).slice(0, this.config.BEST_N_EDGES);
+
+      possibleEdges.forEach(edge => {
+        const source2 = edge[0];
+        const id = buildId(source1, source2);
+
+        if (!edgeMemory.has(id)) {
+          edgeMemory.set(id, true);
+          const { eventsSharedCount, meanToneDist } = edge[1];
+
+          this.elements.push({
+            group: "edges", data: {
+              id,
+              source: source1,
+              target: source2,
+              width: Math.exp(1 + 2 * (eventsSharedCount / maxSharedEventsCount)),
+              color: meanToneDist > 1 ? "red" : "green",
+              dist: meanToneDist,
+            }
+          });
+        }
+      });
+    });
+
   }
 
   updateViz() {
     this.cy.elements().remove();
-
-    const cy_nodes = this.nodes.map(data => {
-      return { group: "nodes", data };
-    });
-
-    const cy_edges = this.edges.map(
-      data => {
-        return { group: "edges", data };
-      });
-
-    // const cy_edges = _(this.edges)
-    //   .map(e => ({ group: "edges", data: e }))
-    //   .value();
-
-    this.cy.add(cy_nodes);
-    this.cy.add(cy_edges);
-
-    //console.log(cy_edges);
-    //console.log(cy_nodes);
+    this.cy.add(this.elements);
 
     this.cy.layout({
-      name: "concentric",
-      nodeOverlap: 20,
-      fit: true,
-      randomize: false,
-      componentSpacing: 100,
-      nestingFactor: 5,
-      idealEdgeLength: 100
+      name: "cola",
+      edgeLength: (edge) => edge.dist
+      // nodeOverlap: 20,
+      // fit: true,
+      // randomize: false,
+      // componentSpacing: 100,
+      // nestingFactor: 5,
+      // idealEdgeLength: 100
     }).run();
   }
 }
