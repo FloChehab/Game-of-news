@@ -1,9 +1,9 @@
 import TimeWindowSelector from "./TimeWindowSelector";
 import dataManagerInstance from "../../fetchData/DataManager";
 import { dateToStrIso } from "./utils/dateManipulations";
-//import StackedGraph from "../stackedGraph/StackedGraph";
 import CONFIG from "../../config";
 import Graph from "../graph/Graph";
+import StackedGraph from "../stackedGraph/StackedGraph";
 
 
 function initSelectDataset() {
@@ -47,22 +47,21 @@ class Dashboard {
     const highlightedDate = setUpDateWindowSlector();
     new TimeWindowSelector(highlightedDate).init();
 
-    //Add random streamgraph handleResize
-    const stackedGraphContext = document.createElement("div");
-    stackedGraphContext.setAttribute("id", "stackedGraph");
-    stackedGraphContext.setAttribute("style", "height: 600px");
-    document.getElementById("dashboard").appendChild(stackedGraphContext);
-
     // Fetch some sample data on click
     const btn = document.getElementById("btn-get-sample-dataset");
     btn.onclick = () => dataManagerInstance.getDatasetAndUpdateViews(CONFIG.PRE_FETCHED_DATASETS[0]);
-    // new StackedGraph(stackedGraphContext, 7).init();
 
     const graphContext = document.createElement("div");
     graphContext.setAttribute("id","graph");
     graphContext.style.setProperty("height","600px");
     document.getElementById("dashboard").appendChild(graphContext);
     new Graph(graphContext).init();
+
+    //Add random streamgraph handleResize
+    const stackedGraphContext = document.createElement("div");
+    stackedGraphContext.setAttribute("id", "stackedGraph");
+    document.getElementById("dashboard").appendChild(stackedGraphContext);
+    new StackedGraph(stackedGraphContext).init();
   }
 }
 
