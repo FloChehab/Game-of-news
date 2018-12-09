@@ -80,7 +80,6 @@
           </div>
         </div>
       </div>
-
       <div class="c-section__footer p-2">
 
         <div class="form-group">
@@ -91,26 +90,26 @@
 
         <div id='timeWindowSelectorWrapper'>
           <div class="API-GDELT-REQUIRED" data-required="true" style="display: none;">
-            <div>
-              Or select a custom one
+              <div>
+                Or select a custom one
+              </div>
+              <div id='timeWindowSelector'></div>
+              <div>
+                <p>Center window on:</p>
+                <input id='dateTimeWindowSelector' type='date' required pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" />
+              </div>
             </div>
-            <div id='timeWindowSelector'></div>
-            <div>
-              <p>Center window on:</p>
-              <input id='dateTimeWindowSelector' type='date' required pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" />
+            <div class="alert alert-info API-GDELT-REQUIRED" role="alert" data-required="false">
+              Some more advanced functionnalities regarding live querying the GDELT database have been disabled since the
+              server that is currently used doesn't support this feature. You can still explore with the provided
+              datasets.
             </div>
-          </div>
-          <div class="alert alert-info API-GDELT-REQUIRED" role="alert" data-required="false">
-            Some more advanced functionnalities regarding live querying the GDELT database have been disabled since the
-            server that is currently used doesn't support this feature. You can still explore with the provided
-            datasets.
           </div>
         </div>
+
       </div>
-
     </div>
-  </div>
 
-</body>
+  </body>
 
-</html>
+  </html>
