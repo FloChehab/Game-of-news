@@ -51,17 +51,13 @@ class Dashboard {
     const btn = document.getElementById("btn-get-sample-dataset");
     btn.onclick = () => dataManagerInstance.getDatasetAndUpdateViews(CONFIG.PRE_FETCHED_DATASETS[0]);
 
-    const graphContext = document.createElement("div");
-    graphContext.setAttribute("id","graph");
-    graphContext.style.setProperty("height","600px");
-    document.getElementById("dashboard").appendChild(graphContext);
-    new Graph(graphContext).init();
+    new Graph(
+      document.getElementById("dashboardGraph"),
+      document.getElementById("dashboardGraphParams")
+    ).init();
 
     //Add random streamgraph handleResize
-    const stackedGraphContext = document.createElement("div");
-    stackedGraphContext.setAttribute("id", "stackedGraph");
-    document.getElementById("dashboard").appendChild(stackedGraphContext);
-    new StackedGraph(stackedGraphContext).init();
+    new StackedGraph(document.getElementById("dashboardStackedGraphContainer")).init();
   }
 }
 

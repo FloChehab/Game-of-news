@@ -66,8 +66,19 @@
       <!--  -->
       <a href="#story-block" class="btn btn-lg c-section__btn js-trigger">Go to story</a>
       <a href="#home-block" class="btn btn-lg c-section__btn js-trigger">Go to home</a>
+      <button id="btn-get-sample-dataset" type="button" class="btn btn-primary">Set initial dataset</button>
+
       <div id='dashboard'>
-        <button id="btn-get-sample-dataset" type="button" class="btn btn-primary">Set initial dataset</button>
+        <div class="dashboard-plots-container">
+
+          <div id="dashboardGraphContainer" class="dashboard-plot-item">
+            <div id="dashboardGraphParams"></div>
+            <div id="dashboardGraph" style="height:600px;"></div>
+          </div>
+
+          <div id="dashboardStackedGraphContainer" class="dashboard-plot-item">
+          </div>
+        </div>
       </div>
 
       <div class="c-section__footer p-2">
