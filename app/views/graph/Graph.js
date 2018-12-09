@@ -29,6 +29,8 @@ class Graph {
     this.config = {
       maxNbNodes: 13,
       bestNEdges: 3,
+      minNbSharedEventEdge: 1,
+      toneDistThreshold: 1,
     };
   }
 
@@ -150,16 +152,18 @@ class Graph {
           edgeMemory.set(id, true);
           const { eventsSharedCount, meanToneDist } = edge[1];
 
-          this.generalElements.push({
-            group: "edges", data: {
-              id,
-              source: source1,
-              target: source2,
-              width: Math.exp(1 + 2 * (eventsSharedCount / maxSharedEventsCount)),
-              color: meanToneDist > 1 ? "red" : "green",
-              dist: meanToneDist,
-            }
-          });
+          if (eventsSharedCount > this.config.minNbSharedEventEdge) {
+            this.generalElements.push({
+              group: "edges", data: {
+                id,
+                source: source1,
+                target: source2,
+                width: Math.exp(1 + 2 * (eventsSharedCount / maxSharedEventsCount)),
+                color: meanToneDist > this.config.toneDistThreshold ? "red" : "green",
+                dist: meanToneDist,
+              }
+            });
+          }
         }
       });
     });

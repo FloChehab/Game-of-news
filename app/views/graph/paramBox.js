@@ -3,10 +3,6 @@ import React from "react";
 import ReactDOM from "react-dom";
 import Proptypes from "prop-types";
 
-// var config = {
-//   maxNbNodes: 13,
-//   bestNEdges: 3,
-// };
 function getId() {
   return new Date().getTime();
 }
@@ -59,22 +55,59 @@ export class GraphParamBox {
     this.config = config;
     this.parent = parent;
     this.init(container);
-
   }
 
   init(container) {
 
     ReactDOM.render(
-      <Slider
-        labelText={"Number of nodes (best nodes in terms of shared events)"}
-        inputProps={{
-          min: 2,
-          max: CONFIG.GRAPH_MAX_NB_NODES,
-          step: 1,
-        }}
-        value={this.config.maxNbNodes}
-        onChange={(maxNbNodes) => this.updateConfig({ maxNbNodes })}
-      />
+      <div>
+        <Slider
+          labelText={"Number of nodes (best nodes in terms of shared events)"}
+          inputProps={{
+            min: 2,
+            max: CONFIG.GRAPH_MAX_NB_NODES,
+            step: 1,
+          }}
+          value={this.config.maxNbNodes}
+          onChange={(maxNbNodes) => this.updateConfig({ maxNbNodes })}
+        />
+
+        <Slider
+          labelText={"Max number of edges per node (biggest)"}
+          inputProps={{
+            min: 1,
+            max: CONFIG.GRAPH_MAX_NB_BEST_EDGES,
+            step: 1,
+          }}
+          value={this.config.bestNEdges}
+          onChange={(bestNEdges) => this.updateConfig({ bestNEdges })}
+        />
+
+        <Slider
+          labelText={"Show only edges that have at least in common"}
+          inputProps={{
+            min: 1,
+            max: CONFIG.GRAPH_MAX_MIN_NB_SHARED_EVENTS_EDGE,
+            step: 1,
+          }}
+          value={this.config.minNbSharedEventEdge}
+          onChange={(minNbSharedEventEdge) => this.updateConfig({ minNbSharedEventEdge })}
+        />
+
+        <Slider
+          labelText={"Tone distance threshold"}
+          inputProps={{
+            min: 0.02,
+            max: CONFIG.GRAPH_MAX_NB_BEST_EDGES,
+            step: 0.02,
+          }}
+          value={this.config.toneDistThreshold}
+          onChange={(toneDistThreshold) => this.updateConfig({ toneDistThreshold })}
+        />
+
+
+
+      </div>
       , container);
   }
 
