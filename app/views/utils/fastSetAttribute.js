@@ -5,7 +5,7 @@
  * @param {HTMLElement} el
  * @param {Object} attrs
  */
-export function fastAttribute(el, attrs) {
+export function fastSetAttribute(el, attrs) {
   for (const attrKey in attrs) {
     el.setAttribute(attrKey, attrs[attrKey]);
   }

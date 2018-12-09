@@ -1,4 +1,4 @@
-import { fastAttribute } from "../utils/fastAttribute";
+import { fastSetAttribute } from "../utils/fastSetAttribute";
 import CONFIG from "../../config";
 
 // var config = {
@@ -12,16 +12,19 @@ function getId() {
 export class GraphParamBox {
   constructor(parent, container, config) {
     this.config = config;
+    this.parent = parent;
     this.init(container);
   }
 
   init(container) {
-    const rangeId = `range:${getId()}`;
+    const rangeId = `range-${getId()}`;
     let label = document.createElement("label");
-    fastAttribute(label, { for: rangeId });
+    label.innerText = "Number of nodes (best nodes in terms of shared events)";
+    fastSetAttribute(label, { for: rangeId });
+
 
     let inputNbNodes = document.createElement("input");
-    fastAttribute(inputNbNodes, {
+    fastSetAttribute(inputNbNodes, {
       type: "range",
       class: "custom-range",
       min: 2,
@@ -32,11 +35,21 @@ export class GraphParamBox {
     });
 
     inputNbNodes.onchange = () => {
-      console.log(inputNbNodes.value);
+      this.updateConfig({
+        maxNbNodes: inputNbNodes.value
+      });
     };
 
     container.appendChild(label);
     container.appendChild(inputNbNodes);
+  }
+
+  updateConfig(config) {
+    for (const conf in config) {
+      this.config[conf] = config[conf];
+    }
+
+    this.parent.updateConfig(this.config);
   }
 
 }

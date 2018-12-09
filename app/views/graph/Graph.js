@@ -96,6 +96,11 @@ class Graph {
     this.processAndDisplay();
   }
 
+  updateConfig(config) {
+    this.config = config;
+    this.processAndDisplay(this.config);
+  }
+
   processAndDisplay(config = this.config) {
     this.processData(config);
     this.displayGeneralView();
