@@ -1,74 +1,83 @@
 /* default / demo page */
 
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 html,
 body {
-    margin: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
 body {
-    min-height: 1280px;
-    font-weight: 300;
-    color: #2a2a2a;
+  min-height: 1280px;
+  font-weight: 300;
+  color: #2a2a2a;
+}
+
+.dashboard-plots-container {
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-plot-item {
+  flex: 1;
 }
 
 // Move to css
 .js-trigger {
-    margin-left: 10px;
-    margin-right: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 .c-section {
-    min-height: 100vh;
-    padding: 15px;
+  min-height: 100vh;
+  padding: 15px;
 }
 
 .c-section--primary {
-    background-color: #dee2e6;
-    color: #212529;
+  background-color: #dee2e6;
+  color: #212529;
 }
 
 .c-section--secondary {
-    margin-top: 10vh;
+  margin-top: 10vh;
 }
 
 .c-section__btn {
-    cursor: pointer;
-    background-color: #12b886;
-    border: 0;
-    color: white;
+  cursor: pointer;
+  background-color: #12b886;
+  border: 0;
+  color: white;
 }
 
 .c-section__btn:hover,
 .c-section__btn:focus {
-    background-color: #0ca678;
-    color: white;
-    box-shadow: none;
+  background-color: #0ca678;
+  color: white;
+  box-shadow: none;
 }
 
 .c-section>.lead {
-    color: #868e96;
+  color: #868e96;
 }
 
 .c-section__link {
-    color: #495057;
+  color: #495057;
 }
 
 .c-section__link:hover {
-    color: #12b886;
+  color: #12b886;
 }
 
 .c-section__footer {
-    color: #868e96;
+  color: #868e96;
 }
 
 .u-flex-extend {
-    -webkit-box-flex: 1;
-    -ms-flex: 1;
-    flex: 1
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1
 }

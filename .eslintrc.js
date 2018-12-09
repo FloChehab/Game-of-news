@@ -4,13 +4,21 @@ module.exports = {
     "es6": true,
     "jest/globals": true
   },
-  "extends": "eslint:recommended",
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended"
+  ],
+  "parser": "babel-eslint",
   "parserOptions": {
     "ecmaVersion": 2018,
-    "sourceType": "module"
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
   },
   "plugins": [
-    "jest"
+    "jest",
+    "react"
   ],
   "rules": {
     "indent": [
