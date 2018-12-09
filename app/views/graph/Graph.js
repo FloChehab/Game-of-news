@@ -1,19 +1,23 @@
+import React from "react";
+import ReactDOM from "react-dom";
 import cytoscape from "cytoscape";
 import cola from "cytoscape-cola";
-
 // import _ from "lodash";
 import dataManagerInstance from "../../fetchData/DataManager";
 import { buildEdgeId } from "./Ids";
 // import { runInThismainContext } from "vm";
+import "../../../assets/styles/Graph.scss";
 
 import { edgesToMap } from "./edgesToMap";
 import { GraphParamBox } from "./paramBox";
+
 
 const VIEW_MODE_OVERVIEW = 0;
 const VIEW_MODE_DETAILS = 1;
 
 const NODE_SOURCE_COLOR = "grey";
 const NODE_EVENT_COLOR = "orange";
+
 
 class Graph {
   constructor(mainContext, paramContext) {
@@ -40,6 +44,20 @@ class Graph {
     if (typeof this.paramContext !== "undefined") {
       new GraphParamBox(this, this.paramContext, this.config);
     }
+
+    const divZoomBack = document.createElement("div");
+    this.mainContext.appendChild(divZoomBack);
+
+    ReactDOM.render(
+      <button
+        type="button"
+        className="btn btn-primary btn-graph-zoom-out"
+        onClick={() => self.processAndDisplay()}
+      >
+        Reset state
+      </button>
+      , divZoomBack);
+
 
     this.cy = cytoscape.use(cola)({
       container: this.mainContext,

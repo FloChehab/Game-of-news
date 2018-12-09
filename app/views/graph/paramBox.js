@@ -104,9 +104,6 @@ export class GraphParamBox {
           value={this.config.toneDistThreshold}
           onChange={(toneDistThreshold) => this.updateConfig({ toneDistThreshold })}
         />
-
-
-
       </div>
       , container);
   }
