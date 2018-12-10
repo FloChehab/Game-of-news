@@ -2,12 +2,9 @@ import React from "react";
 import ReactDOM from "react-dom";
 import cytoscape from "cytoscape";
 import cola from "cytoscape-cola";
-// import _ from "lodash";
 import dataManagerInstance from "../../fetchData/DataManager";
 import { buildEdgeId } from "./Ids";
-// import { runInThismainContext } from "vm";
 import "../../../assets/styles/Graph.scss";
-
 import { edgesToMap } from "./edgesToMap";
 import { GraphParamBox } from "./paramBox";
 
@@ -25,7 +22,6 @@ class Graph {
     this.mainContext = mainContext;
     this.paramContext = paramContext;
     this.rawData = Object();
-    this.connections = {};
     this.generalElements = Array();
     this.viewMode = undefined;
 
@@ -66,21 +62,25 @@ class Graph {
           selector: "node",
           style: {
             "background-color": "data(color)",
-            "label": "data(id)",
+            "label": "data(label)",
+            "text-valign": "center",
             "width": "data(scale)",
             "height": "data(scale)",
-            "font-size": "data(scale)"
+            "font-size": "data(scale)",
+            "color": "white",
+            "text-outline-width": 2,
+            "text-outline-color":"data(color)",
           }
         },
         {
           selector: "edge",
           style: {
             "width": "data(width)",
-            "opacity": 0.7,
+            "opacity": 0.8,
             "line-color": "data(color)",
             //"target-arrow-color": "#ccc",
             //"target-arrow-shape": "triangle",
-            "curve-style": "unbundled-bezier",
+            //"curve-style": "unbundled-bezier",
             //'control-point-things': xyz
           }
         }
@@ -148,8 +148,9 @@ class Graph {
       this.generalElements.push({
         group: "nodes", data: {
           id: el[0],
+          label: el[0].split(".")[0],
           color: NODE_SOURCE_COLOR,
-          scale: 10 * el[1] / maxSharedEventsCount
+          scale: 15 * el[1] / maxSharedEventsCount
         }
       });
     });
@@ -176,7 +177,7 @@ class Graph {
                 id,
                 source: source1,
                 target: source2,
-                width: Math.exp(1 + 2 * (eventsSharedCount / maxSharedEventsCount)),
+                width: Math.exp(1 + 2 * (eventsSharedCount / maxSharedEventsCount))/6,
                 color: meanToneDist > this.config.toneDistThreshold ? "red" : "green",
                 dist: meanToneDist,
               }
@@ -251,25 +252,16 @@ class Graph {
 
     if (this.viewMode === VIEW_MODE_OVERVIEW) {
       this.cy.layout({
-        name: "circle",
-        edgeLength: (edge) => edge.dist
-        // nodeOverlap: 20,
-        // fit: true,
-        // randomize: false,
-        // componentSpacing: 100,
-        // nestingFactor: 5,
-        // idealEdgeLength: 100
+        name: "cola",
+        ungrabifyWhileSimulating: false,
+        maxSimulationTime: 5500,
+        randomize: true,
+        nodeDimensionsIncludeLabels: false
       }).run();
     } else if (this.viewMode === VIEW_MODE_DETAILS) {
       this.cy.layout({
         name: "cola",
         edgeLength: (edge) => edge.dist
-        // nodeOverlap: 20,
-        // fit: true,
-        // randomize: false,
-        // componentSpacing: 100,
-        // nestingFactor: 5,
-        // idealEdgeLength: 100
       }).run();
     } else {
       throw new Error("Not supported");
