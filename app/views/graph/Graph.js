@@ -2,6 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 import cytoscape from "cytoscape";
 import cola from "cytoscape-cola";
+import coseBilkent from "cytoscape-cose-bilkent";
+cytoscape.use( coseBilkent );
 import dataManagerInstance from "../../fetchData/DataManager";
 import { buildEdgeId } from "./Ids";
 import "../../../assets/styles/Graph.scss";
@@ -150,7 +152,7 @@ class Graph {
           id: el[0],
           label: el[0].split(".")[0],
           color: NODE_SOURCE_COLOR,
-          scale: 15 * el[1] / maxSharedEventsCount
+          scale: 8 * el[1] / maxSharedEventsCount
         }
       });
     });
@@ -251,12 +253,28 @@ class Graph {
     this.cy.add(elements);
 
     if (this.viewMode === VIEW_MODE_OVERVIEW) {
+      /*
       this.cy.layout({
         name: "cola",
         ungrabifyWhileSimulating: false,
         maxSimulationTime: 5500,
         randomize: true,
         nodeDimensionsIncludeLabels: false
+      }).run();
+      */
+      this.cy.layout({
+        name: "cose-bilkent",
+        nodeRepulsion: 5000,
+        idealEdgeLength: 60,
+        edgeElasticity: 0.45,
+        nestingFactor: 0.1,
+        gravity: 0.1,
+        numIter: 5000,
+        gravityRangeCompound: 1.5,
+        gravityCompound: 1.0,
+        gravityRange: 4.0,
+        initialEnergyOnIncremental: 0.5,
+        tile: true
       }).run();
     } else if (this.viewMode === VIEW_MODE_DETAILS) {
       this.cy.layout({
