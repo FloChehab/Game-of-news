@@ -5,7 +5,6 @@ import CONFIG from "../../config";
 import Graph from "../graph/Graph";
 import StackedGraph from "../stackedGraph/StackedGraph";
 
-
 function initSelectDataset() {
   let select = document.getElementById("dashboardSelectDataset");
   for (const dataset of CONFIG.PRE_FETCHED_DATASETS) {
