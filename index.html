@@ -76,8 +76,18 @@
             <div id="dashboardGraph" style="height:600px;"></div>
           </div>
 
-          <div id="dashboardStackedGraphContainer" class="dashboard-plot-item">
+          <div id="dashboardStackedGraphContainer" class="dashboard-plot-item row">
+            <div id="dashboardStackedGraphLegend" class="card col-3" style="border:none;">
+              <div class="card-body">
+                <h5 class="card-title">Streamgraph</h5>
+                <ul id="dashboardStackedGraphSources" class="list-group">
+                </ul>
+              </div>
+            </div>
+            <div id="dashboardStackedGraphPlot" class="col-9">
+            </div>
           </div>
+
         </div>
       </div>
       <div class="c-section__footer p-2">
