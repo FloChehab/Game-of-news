@@ -1,9 +1,13 @@
+import React from "react";
+import ReactDOM from "react-dom";
+
 import TimeWindowSelector from "./TimeWindowSelector";
 import dataManagerInstance from "../../fetchData/DataManager";
 import { dateToStrIso } from "./utils/dateManipulations";
 import CONFIG from "../../config";
 import Graph from "../graph/Graph";
 import StackedGraph from "../stackedGraph/StackedGraph";
+import ViewMode from "./ViewMode";
 
 function initSelectDataset() {
   let select = document.getElementById("dashboardSelectDataset");
@@ -54,7 +58,9 @@ class Dashboard {
     //Add random streamgraph handleResize
     new StackedGraph(document.getElementById("dashboardStackedGraphPlot")).init();
     // Force init with first dataset
-    dataManagerInstance.getDatasetAndUpdateViews(CONFIG.PRE_FETCHED_DATASETS[0])
+    dataManagerInstance.getDatasetAndUpdateViews(CONFIG.PRE_FETCHED_DATASETS[0]);
+
+    ReactDOM.render(<ViewMode />, document.getElementById("dashboardViewsSelect"));
   }
 }
 
