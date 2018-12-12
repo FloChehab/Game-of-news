@@ -66,40 +66,40 @@
       <!--  -->
       <a href="#story-block" class="btn btn-lg c-section__btn js-trigger">Go to story</a>
       <a href="#home-block" class="btn btn-lg c-section__btn js-trigger">Go to home</a>
-      <button id="btn-get-sample-dataset" type="button" class="btn btn-primary">Set initial dataset</button>
 
-      <div id='dashboard'>
-        <div class="dashboard-plots-container">
-
-          <div id="dashboardGraphContainer" class="dashboard-plot-item">
-            <div id="dashboardGraphParams"></div>
-            <div id="dashboardGraph" style="height:600px;"></div>
-          </div>
-
-          <div id="dashboardStackedGraphContainer" class="dashboard-plot-item row">
-            <div id="dashboardStackedGraphLegend" class="card col-3" style="border:none;">
-              <div class="card-body">
-                <h5 class="card-title">Streamgraph</h5>
-                <ul id="dashboardStackedGraphSources" class="list-group">
-                </ul>
-              </div>
-            </div>
-            <div id="dashboardStackedGraphPlot" class="col-9">
-            </div>
-          </div>
-
-        </div>
+      <div id='dashboardViewsSelect' style="display: inline-block;">
       </div>
-      <div class="c-section__footer p-2">
 
-        <div class="form-group">
-          <label for="dashboardSelectDataset">Change dataset:</label>
-          <select id="dashboardSelectDataset" class="form-control">
-          </select>
+      <div id='dashboard' class="fluid-width-container">
+
+        <div id="dashboardGraphContainer">
+          <div id="dashboardGraphParams"></div>
+          <div id="dashboardGraph" style="height:600px;"></div>
         </div>
 
-        <div id='timeWindowSelectorWrapper'>
-          <div class="API-GDELT-REQUIRED" data-required="true" style="display: none;">
+        <div id="dashboardStackedGraphContainer">
+          <div id="dashboardStackedGraphLegend" class="card" style="border:none;">
+            <div class="card-body">
+              <h5 class="card-title">Streamgraph</h5>
+              <ul id="dashboardStackedGraphSources" class="list-group">
+              </ul>
+            </div>
+          </div>
+          <div id="dashboardStackedGraphPlot">
+          </div>
+
+        </div>
+
+        <div class="c-section__footer p-2 fluid-width-container">
+
+          <div class="form-group">
+            <label for="dashboardSelectDataset">Change dataset:</label>
+            <select id="dashboardSelectDataset" class="form-control">
+            </select>
+          </div>
+
+          <div id='timeWindowSelectorWrapper'>
+            <div class="API-GDELT-REQUIRED" data-required="true" style="display: none;">
               <div>
                 Or select a custom one
               </div>
@@ -110,7 +110,8 @@
               </div>
             </div>
             <div class="alert alert-info API-GDELT-REQUIRED" role="alert" data-required="false">
-              Some more advanced functionnalities regarding live querying the GDELT database have been disabled since the
+              Some more advanced functionnalities regarding live querying the GDELT database have been disabled since
+              the
               server that is currently used doesn't support this feature. You can still explore with the provided
               datasets.
             </div>
@@ -119,7 +120,7 @@
 
       </div>
     </div>
+  </div>
+</body>
 
-  </body>
-
-  </html>
+</html>

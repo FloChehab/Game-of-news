@@ -17,13 +17,13 @@ body {
   color: #2a2a2a;
 }
 
-.dashboard-plots-container {
-  display: flex;
-  align-items: center;
-}
-
-.dashboard-plot-item {
-  flex: 1;
+.fluid-width-container {
+  @media screen and (min-width: 1200px) {
+    width: 80%;
+    max-width: 1920px;
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
 
 // Move to css

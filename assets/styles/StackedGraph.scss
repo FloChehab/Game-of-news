@@ -6,6 +6,21 @@
   }
 
   padding: 3%;
-  height: 45vw;
+  display: flex;
+  align-items: center;
+
+  #dashboardStackedGraphLegend{
+    flex:1;
+    min-width: 200px;
+  }
+
+  #dashboardStackedGraphPlot{
+    flex:5;
+  }
+
+  .list-group-item{
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
+  }
   //position: relative;
 }
