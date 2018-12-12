@@ -57,7 +57,7 @@ class Dashboard {
     ).init();
 
     //Add random streamgraph handleResize
-    new StackedGraph(document.getElementById("dashboardStackedGraphContainer")).init();
+    new StackedGraph(document.getElementById("dashboardStackedGraphPlot")).init();
   }
 }
 
