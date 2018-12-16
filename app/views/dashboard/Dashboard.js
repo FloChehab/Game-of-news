@@ -9,11 +9,34 @@ import Graph from "../graph/Graph";
 import StackedGraph from "../stackedGraph/StackedGraph";
 import ViewMode from "./ViewMode";
 
+/**
+ * Function to capitalize a string (first letter of the string is uppercase)
+ *
+ * @returns
+ */
+String.prototype.capitalize = function () {
+  return this.charAt(0).toUpperCase() + this.slice(1);
+};
+
 function initSelectDataset() {
+
+  /**
+   * Converts a string like test_1.json
+   * to
+   * Test 1
+   *
+   * @param {string} str
+   */
+  function niceDatasetName(str) {
+    let res = str.split(".")[0]; // Leave out the .json
+    res = res.split("_").join(" ");
+    return res.capitalize();
+  }
+
   let select = document.getElementById("dashboardSelectDataset");
   for (const dataset of CONFIG.PRE_FETCHED_DATASETS) {
     const option = document.createElement("option");
-    option.text = dataset + "  | TODO nicer text";
+    option.text = niceDatasetName(dataset + "  | TODO nicer text");
     option.value = dataset;
     select.add(option);
   }
