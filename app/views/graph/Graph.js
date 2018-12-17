@@ -93,8 +93,8 @@ class Graph {
         {
           selector: "node.highlighted",
           style: {
-            "background-color": "#c35c2f",
-            "text-outline-color":"#c35c2f" }
+            "background-color": "#e65d3e",
+            "text-outline-color":"#e65d3e" }
         },
         {
           selector: "edge.highlighted",
