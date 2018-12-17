@@ -34,6 +34,7 @@ function initSelectDataset() {
   }
 
   let select = document.getElementById("dashboardSelectDataset");
+
   for (const dataset of CONFIG.PRE_FETCHED_DATASETS) {
     const option = document.createElement("option");
     option.text = niceDatasetName(dataset + "  | TODO nicer text");
@@ -45,6 +46,17 @@ function initSelectDataset() {
     dataManagerInstance.getDatasetAndUpdateViews(select.value);
   };
 
+}
+
+function addDatasetToSelect(datasetName, setSelected = true) {
+  let select = document.getElementById("dashboardSelectDataset");
+  const option = document.createElement("option");
+  option.text = datasetName;
+  option.value = datasetName;
+  select.add(option);
+  if (setSelected === true) {
+    select.value = datasetName;
+  }
 }
 
 /**
@@ -69,6 +81,7 @@ class Dashboard {
   constructor() { }
 
   init() {
+    dataManagerInstance.subscribersDatasetUpdated.push(addDatasetToSelect);
     initSelectDataset();
     const highlightedDate = setUpDateWindowSlector();
     new TimeWindowSelector(highlightedDate).init();
@@ -80,6 +93,7 @@ class Dashboard {
 
     //Add random streamgraph handleResize
     new StackedGraph(document.getElementById("dashboardStackedGraphPlot")).init();
+
     // Force init with first dataset
     dataManagerInstance.getDatasetAndUpdateViews(CONFIG.PRE_FETCHED_DATASETS[0]);
 

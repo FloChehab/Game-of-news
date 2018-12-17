@@ -6,6 +6,24 @@ import {
 } from "./fetchData";
 
 /**
+ * Function to hide and show divs based on html class names:
+ * And data-required attribute value
+ *
+ * @param {string} className
+ * @param {boolean} [inverse=false]
+ */
+function setDisplayAttribute(className, inverse = false) {
+  const test = !inverse ? "true" : "false";
+  for (let el of document.getElementsByClassName(className)) {
+    if (el.getAttribute("data-required") === test) {
+      el.setAttribute("style", "");
+    } else {
+      el.setAttribute("style", "display: none;");
+    }
+  }
+}
+
+/**
  * Class for smartly handling all the data in the app.
  *
  * @class DataManager
@@ -22,6 +40,8 @@ class DataManager {
 
     // Subscribed views
     this.subscribedViews = Array();
+
+    this.subscribersDatasetUpdated = Array();
   }
 
   checkGBQAvailability() {
@@ -29,13 +49,7 @@ class DataManager {
       .then(data => {
         if (data.active === true) {
           this.isGBQAvailable = true;
-          for (let el of document.getElementsByClassName("API-GDELT-REQUIRED")) {
-            if (el.getAttribute("data-required") === "true") {
-              el.setAttribute("style", "");
-            } else {
-              el.setAttribute("style", "display: none;");
-            }
-          }
+          setDisplayAttribute("API-GDELT-REQUIRED", false);
         }
       });
   }
@@ -100,6 +114,7 @@ class DataManager {
 
   /**
    * Makes the Google Big Querry request, and send the data to the views
+   * Will lock the time window selector so that no other request are made.
    *
    * @param {object} queryParameters
    * @memberof DataManager
@@ -109,8 +124,27 @@ class DataManager {
       throw new Error("Server can't make request to Google Big Querry.");
     }
 
+    setDisplayAttribute("can-make-request", false);
+
     fetchQueryResult(queryParameters)
-      .then((data) => this.updateViewsData(data));
+      .then((data) => {
+        if (data.empty === true) {
+          alert("No data matching your request was found on Google Big Querry. Try widening the time interval.");
+        } else {
+          const now = new Date();
+          const name = `Dataset created on: ${now.toJSON().split(".")[0]}`;
+          this.storeDataset(name, data);
+          for (const func of this.subscribersDatasetUpdated) {
+            func(name);
+          }
+          this.updateViewsData(data);
+        }
+        setDisplayAttribute("can-make-request", true);
+      })
+      .catch(() => {
+        alert("An error occured while making the request, params where: " + JSON.stringify(queryParameters));
+        setDisplayAttribute("can-make-request", true);
+      });
   }
 
   /**
