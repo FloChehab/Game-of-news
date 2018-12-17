@@ -85,6 +85,14 @@ class Graph {
             "control-point-distances": "-5",
             "control-point-weights": "0.25 0.75"
           }
+        },
+        {
+          selector: "node.hidden",
+          style: {"opacity": "0.2"}
+        },
+        {
+          selector: "edge.hidden",
+          style: {"opacity": "0.2"}
         }
       ],
       layout: {
@@ -115,8 +123,15 @@ class Graph {
       }
     });
 
-  }
+    this.cy.on("mouseover","node",e=>{
+      const sel = e.target;
+      this.cy.elements().difference(sel.outgoers().union(sel.incomers())).not(sel).addClass("hidden");
+    });
+    this.cy.on("mouseout","node",() =>{
+      this.cy.elements().removeClass("hidden");
+    });
 
+  }
 
   updateData(data) {
     this.rawData = data.graph;
