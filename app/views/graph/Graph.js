@@ -95,6 +95,10 @@ class Graph {
       wheelSensitivity: 0.2
     });
 
+    this.cy.on("resize", () => {
+      this.cy.fit();
+    });
+
 
     this.cy.on("tap", "edge", evt => {
       if (self.viewMode === VIEW_MODE_OVERVIEW) {
@@ -255,15 +259,6 @@ class Graph {
     this.cy.add(elements);
 
     if (this.viewMode === VIEW_MODE_OVERVIEW) {
-      /*
-      this.cy.layout({
-        name: "cola",
-        ungrabifyWhileSimulating: false,
-        maxSimulationTime: 5500,
-        randomize: true,
-        nodeDimensionsIncludeLabels: false
-      }).run();
-      */
       this.cy.layout({
         name: "cose-bilkent",
         nodeRepulsion: 5000,
