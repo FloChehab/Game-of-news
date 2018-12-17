@@ -81,10 +81,9 @@ class Graph {
             "width": "data(width)",
             "opacity": 0.8,
             "line-color": "data(color)",
-            //"target-arrow-color": "#ccc",
-            //"target-arrow-shape": "triangle",
-            //"curve-style": "unbundled-bezier",
-            //'control-point-things': xyz
+            "curve-style": "unbundled-bezier",
+            "control-point-distances": "-5",
+            "control-point-weights": "0.25 0.75"
           }
         }
       ],
