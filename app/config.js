@@ -1,12 +1,12 @@
 const LIVE_API = "https://gdelt-dataviz-epfl.floflo.ch/";
 
 const todayTimestamp = new Date().getTime();
-const yesterday = new Date(todayTimestamp - (3600 * 24 * 1000));
+const twoDaysBefore = new Date(todayTimestamp - (2 * 3600 * 24 * 1000));
 
 let CONFIG = {
   FIRST_AVAILABLE_GDELT_DATETIME: new Date(Date.UTC(2015, 1, 18, 22, 45, 0, 0)),
   // For simplicity we set the max querrying time to 24 houts earlier
-  LAST_AVAILABLE_GDELT_DATETIME: yesterday,
+  LAST_AVAILABLE_GDELT_DATETIME: twoDaysBefore,
   MAX_NB_HOURS_GBQ_QUERY: 24,
   PRE_FETCHED_DATASETS: ["ex_GBQ_res.json"],
   END_POINT_LIVE_GDELT_DATA: "http://0.0.0.0:8000/",

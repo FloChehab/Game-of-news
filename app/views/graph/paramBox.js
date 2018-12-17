@@ -2,6 +2,7 @@ import CONFIG from "../../config";
 import React from "react";
 import ReactDOM from "react-dom";
 import Proptypes from "prop-types";
+import "../../../assets/styles/GraphParamBox.scss";
 
 function getId() {
   return new Date().getTime();
@@ -25,9 +26,9 @@ class Slider extends React.Component {
     const rangeId = `range-${getId()}`;
 
     return (
-      <div>
-        <label htmlFor={rangeId}>
-          {this.props.labelText}
+      <div className={this.props.className}>
+        <label htmlFor={rangeId} style={{ marginBottom: 0, display: "block" }}>
+          {this.props.labelText}: {this.state.value}
         </label>
         <input
           type="range"
@@ -36,6 +37,7 @@ class Slider extends React.Component {
           value={this.state.value}
           onChange={evt => this.handleChange(evt)}
           {...this.props.inputProps}
+          style={{ marginBottom: "1em", display: "block" }}
         />
       </div>
     );
@@ -60,7 +62,7 @@ export class GraphParamBox {
   init(container) {
 
     ReactDOM.render(
-      <div>
+      <div className="graphParamContainer">
         <Slider
           labelText={"Number of nodes (best nodes in terms of shared events)"}
           inputProps={{
@@ -70,6 +72,7 @@ export class GraphParamBox {
           }}
           value={this.config.maxNbNodes}
           onChange={(maxNbNodes) => this.updateConfig({ maxNbNodes })}
+          className="param"
         />
 
         <Slider
@@ -81,6 +84,7 @@ export class GraphParamBox {
           }}
           value={this.config.bestNEdges}
           onChange={(bestNEdges) => this.updateConfig({ bestNEdges })}
+          className="param"
         />
 
         <Slider
@@ -92,6 +96,7 @@ export class GraphParamBox {
           }}
           value={this.config.minNbSharedEventEdge}
           onChange={(minNbSharedEventEdge) => this.updateConfig({ minNbSharedEventEdge })}
+          className="param"
         />
 
         <Slider
@@ -103,6 +108,7 @@ export class GraphParamBox {
           }}
           value={this.config.toneDistThreshold}
           onChange={(toneDistThreshold) => this.updateConfig({ toneDistThreshold })}
+          className="param"
         />
       </div>
       , container);
