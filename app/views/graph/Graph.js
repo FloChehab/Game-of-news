@@ -91,6 +91,19 @@ class Graph {
           style: {"opacity": "0.2"}
         },
         {
+          selector: "node.highlighted",
+          style: {
+            "background-color": "#c35c2f",
+            "text-outline-color":"#c35c2f" }
+        },
+        {
+          selector: "edge.highlighted",
+          style: {
+            "width": Math.exp(3)/5,
+            "opacity": "1"
+          }
+        },
+        {
           selector: "edge.hidden",
           style: {"opacity": "0.2"}
         }
@@ -127,8 +140,15 @@ class Graph {
       const sel = e.target;
       this.cy.elements().difference(sel.outgoers().union(sel.incomers())).not(sel).addClass("hidden");
     });
+    this.cy.on("mouseover","edge",e=>{
+      const sel = e.target;
+      sel.connectedNodes().union(sel).addClass("highlighted");
+    });
     this.cy.on("mouseout","node",() =>{
       this.cy.elements().removeClass("hidden");
+    });
+    this.cy.on("mouseout","edge",() =>{
+      this.cy.elements().removeClass("highlighted");
     });
 
   }
