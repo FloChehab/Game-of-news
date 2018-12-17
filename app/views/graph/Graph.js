@@ -14,7 +14,7 @@ import { GraphParamBox } from "./paramBox";
 const VIEW_MODE_OVERVIEW = 0;
 const VIEW_MODE_DETAILS = 1;
 
-const NODE_SOURCE_COLOR = "grey";
+const NODE_SOURCE_COLOR = "#495149";
 const NODE_EVENT_COLOR = "orange";
 
 
@@ -69,6 +69,7 @@ class Graph {
             "width": "data(scale)",
             "height": "data(scale)",
             "font-size": "data(scale)",
+            "font-family": "Special Elite",
             "color": "white",
             "text-outline-width": 2,
             "text-outline-color":"data(color)",
@@ -90,7 +91,8 @@ class Graph {
       layout: {
         name: "grid",
         rows: 1
-      }
+      },
+      wheelSensitivity: 0.2
     });
 
 
@@ -180,7 +182,7 @@ class Graph {
                 source: source1,
                 target: source2,
                 width: Math.exp(1 + 2 * (eventsSharedCount / maxSharedEventsCount))/6,
-                color: meanToneDist > this.config.toneDistThreshold ? "red" : "green",
+                color: meanToneDist > this.config.toneDistThreshold ? "  #a20417" : " #007144",
                 dist: meanToneDist,
               }
             });
