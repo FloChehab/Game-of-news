@@ -96,8 +96,15 @@
 
           <div class="form-group">
             <label for="dashboardSelectDataset">Change dataset:</label>
-            <select id="dashboardSelectDataset" class="form-control">
-            </select>
+            <div class="flexContainer">
+              <select id="dashboardSelectDataset" class="form-control">
+              </select>
+              <button id="buttonDownloadDataset" class="btn btn-primary">
+                Export dataset
+              </button>
+            </div>
+            Or restore a previously exported dataset:
+            <input type="file" id="inputLoadDataset">
           </div>
 
           <div id='timeWindowSelectorWrapper'>

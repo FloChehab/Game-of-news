@@ -111,6 +111,17 @@ class DataManager {
     }
   }
 
+  /**
+   * Signal observers that a new dataset is available in the datamanger
+   *
+   * @param {string} name
+   * @memberof DataManager
+   */
+  signalNewDatasetAvailable(name) {
+    for (const func of this.subscribersDatasetUpdated) {
+      func(name);
+    }
+  }
 
   /**
    * Makes the Google Big Querry request, and send the data to the views
@@ -134,9 +145,7 @@ class DataManager {
           const now = new Date();
           const name = `Dataset created on: ${now.toJSON().split(".")[0]}`;
           this.storeDataset(name, data);
-          for (const func of this.subscribersDatasetUpdated) {
-            func(name);
-          }
+          this.signalNewDatasetAvailable(name);
           this.updateViewsData(data);
         }
         setDisplayAttribute("can-make-request", true);
@@ -173,6 +182,23 @@ class DataManager {
     this.subscribedViews.forEach((v) => v.updateData(data));
   }
 
+  /**
+   * Add a dataset to the datamanager from a File
+   *
+   * @param {File} file
+   * @memberof DataManager
+   */
+  addDatasetFromFile(file) {
+    const fr = new FileReader();
+    fr.onloadend = () => {
+      const data = JSON.parse(fr.result);
+      const name = file.name.replace(".json", "");
+      this.storeDataset(name, data);
+      this.signalNewDatasetAvailable(name);
+      this.updateViewsData(data);
+    };
+    fr.readAsText(file);
+  }
 }
 
 const dataManagerInstance = new DataManager();

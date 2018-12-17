@@ -8,6 +8,7 @@ import CONFIG from "../../config";
 import Graph from "../graph/Graph";
 import StackedGraph from "../stackedGraph/StackedGraph";
 import ViewMode from "./ViewMode";
+import { downloadObjectAsJson } from "./utils/downloadObjectAsJson";
 
 /**
  * Function to capitalize a string (first letter of the string is uppercase)
@@ -17,6 +18,21 @@ import ViewMode from "./ViewMode";
 String.prototype.capitalize = function () {
   return this.charAt(0).toUpperCase() + this.slice(1);
 };
+
+
+function initRestoreDataset() {
+  const input = document.getElementById("inputLoadDataset");
+  input.onchange = (evt) => {
+    try {
+      const file = evt.target.files[0];
+      dataManagerInstance.addDatasetFromFile(file);
+    } catch (err) {
+      alert("Sorry, an error occured while loading this file. You can look at the console to know more.");
+      console.error(err);  // eslint-disable-line no-console
+    }
+
+  };
+}
 
 function initSelectDataset() {
 
@@ -46,6 +62,12 @@ function initSelectDataset() {
     dataManagerInstance.getDatasetAndUpdateViews(select.value);
   };
 
+  const btnDownload = document.getElementById("buttonDownloadDataset");
+  btnDownload.onclick = () => {
+    const selected = select.value;
+    const data = dataManagerInstance.datasetsStorage.get(selected);
+    downloadObjectAsJson(data, selected);
+  };
 }
 
 function addDatasetToSelect(datasetName, setSelected = true) {
@@ -83,6 +105,7 @@ class Dashboard {
   init() {
     dataManagerInstance.subscribersDatasetUpdated.push(addDatasetToSelect);
     initSelectDataset();
+    initRestoreDataset();
     const highlightedDate = setUpDateWindowSlector();
     new TimeWindowSelector(highlightedDate).init();
 
