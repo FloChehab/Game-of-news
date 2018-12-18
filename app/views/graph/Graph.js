@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import cytoscape from "cytoscape";
-import cola from "cytoscape-cola";
 import coseBilkent from "cytoscape-cose-bilkent";
 cytoscape.use( coseBilkent );
 import dataManagerInstance from "../../fetchData/DataManager";
@@ -58,7 +57,7 @@ class Graph {
       , divZoomBack);
 
 
-    this.cy = cytoscape.use(cola)({
+    this.cy = cytoscape({
       container: this.mainContext,
       style: [
         {
@@ -107,7 +106,7 @@ class Graph {
         {
           selector: "edge.hidden",
           style: {"opacity": "0.2"}
-        }
+        },
       ],
       layout: {
         name: "grid",
@@ -133,23 +132,31 @@ class Graph {
           source2 = source;
         }
 
+        hideAllTooltips(this.cy);
         self.displayPreciseView(source1, source2);
       }
     });
 
     this.cy.on("mouseover","node",e=>{
-      const sel = e.target;
-      this.cy.elements().difference(sel.outgoers().union(sel.incomers())).not(sel).addClass("hidden");
+      if (self.viewMode === VIEW_MODE_OVERVIEW ||
+        (self.viewMode === VIEW_MODE_DETAILS && e.target.data("type")==="event")) {
+        const sel = e.target;
+        this.cy.elements().difference(sel.outgoers().union(sel.incomers())).not(sel).addClass("hidden");
+      }
     });
     this.cy.on("mouseover","edge",e=>{
-      const sel = e.target;
-      sel.connectedNodes().union(sel).addClass("highlighted");
+      if (self.viewMode === VIEW_MODE_OVERVIEW) {
+        const sel = e.target;
+        sel.connectedNodes().union(sel).addClass("highlighted");
+      }
     });
     this.cy.on("mouseout","node",() =>{
       this.cy.elements().removeClass("hidden");
     });
     this.cy.on("mouseout","edge",() =>{
-      this.cy.elements().removeClass("highlighted");
+      if (self.viewMode === VIEW_MODE_OVERVIEW) {
+        this.cy.elements().removeClass("highlighted");
+      }
     });
 
     this.cy.on("tap",e=>{
@@ -208,7 +215,7 @@ class Graph {
           label: el[0].split(".")[0],
           color: NODE_SOURCE_COLOR,
           scale: 8 * el[1] / maxSharedEventsCount,
-          sharedEventsCount: el[1]
+          sharedEventsCount: el[1],
         }
       });
     });
@@ -249,6 +256,7 @@ class Graph {
   }
 
   displayGeneralView() {
+    hideAllTooltips(this.cy);
     this.viewMode = VIEW_MODE_OVERVIEW;
     this.updateViz(this.generalElements);
   }
@@ -261,28 +269,46 @@ class Graph {
    * @memberof Graph
    */
   displayPreciseView(source1, source2) {
+    const source1_node = Object.entries(this.rawData.nodes).find(e=>{
+      return e[0] === source1;
+    });
+    const source2_node = Object.entries(this.rawData.nodes).find(e=>{
+      return e[0] === source2;
+    });
     let elements = Array();
 
-    [source1, source2].forEach(source => {
+    [[source1_node,0], [source2_node,200]].forEach((node) => {
       elements.push({
         group: "nodes", data: {
           color: NODE_SOURCE_COLOR,
-          id: source,
-          scale: 1
-        }
+          id: node[0][0],
+          scale: 8,
+          label: node[0][0].split(".")[0],
+          sharedEventsCount: node[0][1],
+          type: "source"
+        },
+        position: {x:node[1], y:50}
       });
     });
 
     const edgesInfo = this.rawData.edgesData;
     const sharedEvents = edgesInfo[source1][source2];
+
+    const eventsNum = Object.keys(sharedEvents).length;
+    const step = 100/eventsNum;
+    const pos_y = Array.apply(null, Array(eventsNum)).map(function (_, i) {return i*step;});
+
     for (const eventId in sharedEvents) {
+      const idx = Object.keys(sharedEvents).indexOf(eventId);
       // event node
       elements.push({
         group: "nodes", data: {
           id: eventId,
           color: NODE_EVENT_COLOR,
-          scale: 1
-        }
+          scale: 2,
+          type: "event"
+        },
+        position: {x:100,y:pos_y[idx]}
       });
 
       // edges
@@ -292,7 +318,7 @@ class Graph {
             id: `${eventId}%${source}`,
             source: source,
             target: eventId,
-            width: 1,
+            width: 0.3,
             color: "red",
             dist: 1,
           }
@@ -309,25 +335,45 @@ class Graph {
     this.cy.elements().remove();
     this.cy.add(elements);
 
-    this.cy.nodes().forEach(node=>{
-      const content = [
-        `<h3>${node.id()}</h3>`,
-        "<hr>",
-        "<ul>",
-        "<h5>",
-        `<li> <span class="badge badge-secondary">${node.data("sharedEventsCount")}</span> shared events </li>`,
-        `<li> <span class="badge badge-secondary">${node.degree()}</span> common outlets  </li>`,
-        "</ul>",
-        "</h5>",
-      ].join("\n");
+    if (this.viewMode === VIEW_MODE_OVERVIEW) {
+      this.cy.nodes().forEach(node=>{
+        const content = [
+          `<h3>${node.id()}</h3>`,
+          "<hr>",
+          "<ul>",
+          "<h5>",
+          `<li><span class="badge badge-secondary">${node.data("sharedEventsCount")}</span>shared events</li>`,
+          `<li><span class="badge badge-secondary">${node.degree()}</span>common outlets</li>`,
+          "</ul>",
+          "</h5>",
+        ].join("\n");
 
-      const tippy = makeTooltip(node,content);
-      node.data("tippy",tippy);
-      node.on("tap",()=> {
-        tippy.show();
-        this.cy.nodes().not(node).forEach(hideTooltip);
+        const tippy = makeTooltip(node,content,"bottom");
+        node.data("tippy",tippy);
+        node.on("tap",()=> {
+          tippy.show();
+          this.cy.nodes().not(node).forEach(hideTooltip);
+        });
       });
-    });
+    } else {
+      this.cy.nodes().filter("[type = 'event']").forEach(node=>{
+        const content = [
+          "<h3>Articles:</h3>",
+          "<ul>",
+          "<li>Link 1</li>",
+          "<li>Link 2</li>",
+          "</ul>"
+        ].join("\n");
+
+        const tippy = makeTooltip(node,content,"right");
+        node.data("tippy",tippy);
+        node.on("tap",()=> {
+          tippy.show();
+          this.cy.nodes().not(node).forEach(hideTooltip);
+        });
+      });
+    }
+
 
     if (this.viewMode === VIEW_MODE_OVERVIEW) {
       this.cy.layout({
@@ -346,13 +392,11 @@ class Graph {
       }).run();
     } else if (this.viewMode === VIEW_MODE_DETAILS) {
       this.cy.layout({
-        name: "cola",
-        edgeLength: (edge) => edge.dist
+        name: "preset"
       }).run();
     } else {
       throw new Error("Not supported");
     }
-
   }
 }
 

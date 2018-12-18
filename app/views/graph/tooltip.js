@@ -5,7 +5,7 @@ import tippy from "tippy.js";
 import "tippy.js/dist/themes/light.css";
 
 
-export function makeTooltip (node,content) {
+export function makeTooltip (node,content,placement) {
   return tippy(node.popperRef(), {
     html: (() => {
       let div = document.createElement("div");
@@ -13,7 +13,7 @@ export function makeTooltip (node,content) {
       return div;
     })(),
     trigger: "manual",
-    placement: "bottom",
+    placement: placement,
     hideOnClick: false,
     interactive: true,
     theme: "light",
