@@ -377,11 +377,13 @@ class Graph {
           id: eventId,
           color: NODE_EVENT_COLOR,
           scale: 2,
-          label: "todo",
+          label: eventId,
           source1,
           source2,
           url1,
           url2,
+          avgTone1,
+          avgTone2,
           type: "event"
         },
         position: { x: 100, y: pos_y[idx] },
@@ -436,8 +438,8 @@ class Graph {
       this.cy.nodes().filter("[type = 'event']").forEach(node => {
         const content = `
           <h3>Articles related to this event</h3>
-          <a target="_blank" href="${node.data("url1")}">From ${node.data("source1")}</a> <br>
-          <a target="_blank" href="${node.data("url2")}">From ${node.data("source2")}</a>
+          <a target="_blank" href="${node.data("url1")}">From ${node.data("source1")}</a> (estimated tone: <span class="badge badge-secondary">${node.data("avgTone1")}</span>)<br>
+          <a target="_blank" href="${node.data("url2")}">From ${node.data("source2")}</a> (estimated tone: <span class="badge badge-secondary">${node.data("avgTone2")}</span>)
         `;
 
         const tippy = makeTooltip(node, content, "right");
