@@ -9,7 +9,7 @@ import { buildEdgeId } from "./Ids";
 import "../../../assets/styles/Graph.scss";
 import { edgesToMap } from "./edgesToMap";
 import { GraphParamBox } from "./paramBox";
-import {makeTooltip} from "./tooltip";
+import {hideAllTooltips, hideTooltip, makeTooltip} from "./tooltip";
 
 
 const VIEW_MODE_OVERVIEW = 0;
@@ -152,6 +152,20 @@ class Graph {
       this.cy.elements().removeClass("highlighted");
     });
 
+    this.cy.on("tap",e=>{
+      if (e.target === this.cy) {
+        hideAllTooltips(this.cy);
+      }
+    });
+
+    this.cy.on("tap","edge",() =>{
+      hideAllTooltips(this.cy);
+    });
+
+    this.cy.on("zoom pan",() =>{
+      hideAllTooltips(this.cy);
+    });
+
   }
 
   updateData(data) {
@@ -193,7 +207,8 @@ class Graph {
           id: el[0],
           label: el[0].split(".")[0],
           color: NODE_SOURCE_COLOR,
-          scale: 8 * el[1] / maxSharedEventsCount
+          scale: 8 * el[1] / maxSharedEventsCount,
+          sharedEventsCount: el[1]
         }
       });
     });
@@ -295,10 +310,22 @@ class Graph {
     this.cy.add(elements);
 
     this.cy.nodes().forEach(node=>{
+      const content = [
+        `<h3>${node.id()}</h3>`,
+        "<hr>",
+        "<ul>",
+        "<h5>",
+        `<li> <span class="badge badge-secondary">${node.data("sharedEventsCount")}</span> shared events </li>`,
+        `<li> <span class="badge badge-secondary">${node.degree()}</span> common outlets  </li>`,
+        "</ul>",
+        "</h5>",
+      ].join("\n");
+
+      const tippy = makeTooltip(node,content);
+      node.data("tippy",tippy);
       node.on("tap",()=> {
-        const tippy = makeTooltip(node,"hello world");
         tippy.show();
-        console.log("tap");
+        this.cy.nodes().not(node).forEach(hideTooltip);
       });
     });
 

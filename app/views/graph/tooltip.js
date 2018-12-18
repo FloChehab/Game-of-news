@@ -2,6 +2,7 @@ import cytoscape from "cytoscape";
 import popper from "cytoscape-popper";
 cytoscape.use( popper );
 import tippy from "tippy.js";
+import "tippy.js/dist/themes/light.css";
 
 
 export function makeTooltip (node,content) {
@@ -12,9 +13,22 @@ export function makeTooltip (node,content) {
       return div;
     })(),
     trigger: "manual",
-    arrow: true,
     placement: "bottom",
     hideOnClick: false,
-    sticky: true
-    }).tooltips[0];
+    interactive: true,
+    theme: "light",
+    size: "large",
+    interactiveBorder: 20,
+    distance: 15
+  }).tooltips[0];
+}
+
+export function hideTooltip (node) {
+  const tippy = node.data("tippy");
+  if (tippy != null)
+    tippy.hide();
+}
+
+export function hideAllTooltips(cy) {
+  cy.nodes().forEach(hideTooltip);
 }

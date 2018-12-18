@@ -25,12 +25,11 @@
     "intersection-observer": "^0.5.1",
     "lodash": "4.17.11",
     "moveto": "^1.7.4",
-    "popper.js": "^1.12.0",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
     "scrollama": "^1.4.4",
     "stickyfilljs": "^2.1.0",
-    "tippy.js": "^2.0.9"
+    "tippy.js": "^2.6.0"
   },
   "devDependencies": {
     "@babel/core": "7.1.2",
