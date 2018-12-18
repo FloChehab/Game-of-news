@@ -362,7 +362,7 @@ class Graph {
     });
 
     const edgesInfo = this.rawData.edgesData;
-    const sharedEvents = edgesInfo[source1][source2];
+    const sharedEvents = edgesInfo[source1][source2].events;
 
     const eventsNum = Object.keys(sharedEvents).length;
     const step = 100 / eventsNum;
