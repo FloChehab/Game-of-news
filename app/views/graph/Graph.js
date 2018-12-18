@@ -2,14 +2,14 @@ import React from "react";
 import ReactDOM from "react-dom";
 import cytoscape from "cytoscape";
 import coseBilkent from "cytoscape-cose-bilkent";
-cytoscape.use( coseBilkent );
 import dataManagerInstance from "../../fetchData/DataManager";
 import { buildEdgeId } from "./Ids";
 import "../../../assets/styles/Graph.scss";
 import { edgesToMap } from "./edgesToMap";
 import { GraphParamBox } from "./paramBox";
-import {hideAllTooltips, hideTooltip, makeTooltip} from "./tooltip";
+import { hideAllTooltips, hideTooltip, makeTooltip } from "./tooltip";
 
+cytoscape.use(coseBilkent);
 
 const VIEW_MODE_OVERVIEW = 0;
 const VIEW_MODE_DETAILS = 1;
@@ -72,7 +72,7 @@ class Graph {
             "font-family": "Special Elite",
             "color": "white",
             "text-outline-width": 2,
-            "text-outline-color":"data(color)",
+            "text-outline-color": "data(color)",
           }
         },
         {
@@ -88,24 +88,25 @@ class Graph {
         },
         {
           selector: "node.hidden",
-          style: {"opacity": "0.2"}
+          style: { "opacity": "0.2" }
         },
         {
           selector: "node.highlighted",
           style: {
             "background-color": "#e65d3e",
-            "text-outline-color":"#e65d3e" }
+            "text-outline-color": "#e65d3e"
+          }
         },
         {
           selector: "edge.highlighted",
           style: {
-            "width": Math.exp(3)/5,
+            "width": Math.exp(3) / 5,
             "opacity": "1"
           }
         },
         {
           selector: "edge.hidden",
-          style: {"opacity": "0.2"}
+          style: { "opacity": "0.2" }
         },
       ],
       layout: {
@@ -137,39 +138,39 @@ class Graph {
       }
     });
 
-    this.cy.on("mouseover","node",e=>{
+    this.cy.on("mouseover", "node", e => {
       if (self.viewMode === VIEW_MODE_OVERVIEW ||
-        (self.viewMode === VIEW_MODE_DETAILS && e.target.data("type")==="event")) {
+        (self.viewMode === VIEW_MODE_DETAILS && e.target.data("type") === "event")) {
         const sel = e.target;
         this.cy.elements().difference(sel.outgoers().union(sel.incomers())).not(sel).addClass("hidden");
       }
     });
-    this.cy.on("mouseover","edge",e=>{
+    this.cy.on("mouseover", "edge", e => {
       if (self.viewMode === VIEW_MODE_OVERVIEW) {
         const sel = e.target;
         sel.connectedNodes().union(sel).addClass("highlighted");
       }
     });
-    this.cy.on("mouseout","node",() =>{
+    this.cy.on("mouseout", "node", () => {
       this.cy.elements().removeClass("hidden");
     });
-    this.cy.on("mouseout","edge",() =>{
+    this.cy.on("mouseout", "edge", () => {
       if (self.viewMode === VIEW_MODE_OVERVIEW) {
         this.cy.elements().removeClass("highlighted");
       }
     });
 
-    this.cy.on("tap",e=>{
+    this.cy.on("tap", e => {
       if (e.target === this.cy) {
         hideAllTooltips(this.cy);
       }
     });
 
-    this.cy.on("tap","edge",() =>{
+    this.cy.on("tap", "edge", () => {
       hideAllTooltips(this.cy);
     });
 
-    this.cy.on("zoom pan",() =>{
+    this.cy.on("zoom pan", () => {
       hideAllTooltips(this.cy);
     });
 
@@ -243,7 +244,7 @@ class Graph {
                 id,
                 source: source1,
                 target: source2,
-                width: Math.exp(1 + 2 * (eventsSharedCount / maxSharedEventsCount))/6,
+                width: Math.exp(1 + 2 * (eventsSharedCount / maxSharedEventsCount)) / 6,
                 color: meanToneDist > this.config.toneDistThreshold ? "  #a20417" : " #007144",
                 dist: meanToneDist,
               }
@@ -269,15 +270,15 @@ class Graph {
    * @memberof Graph
    */
   displayPreciseView(source1, source2) {
-    const source1_node = Object.entries(this.rawData.nodes).find(e=>{
+    const source1_node = Object.entries(this.rawData.nodes).find(e => {
       return e[0] === source1;
     });
-    const source2_node = Object.entries(this.rawData.nodes).find(e=>{
+    const source2_node = Object.entries(this.rawData.nodes).find(e => {
       return e[0] === source2;
     });
     let elements = Array();
 
-    [[source1_node,0], [source2_node,200]].forEach((node) => {
+    [[source1_node, 0], [source2_node, 200]].forEach((node) => {
       elements.push({
         group: "nodes", data: {
           color: NODE_SOURCE_COLOR,
@@ -287,7 +288,7 @@ class Graph {
           sharedEventsCount: node[0][1],
           type: "source"
         },
-        position: {x:node[1], y:50}
+        position: { x: node[1], y: 50 }
       });
     });
 
@@ -295,8 +296,8 @@ class Graph {
     const sharedEvents = edgesInfo[source1][source2];
 
     const eventsNum = Object.keys(sharedEvents).length;
-    const step = 100/eventsNum;
-    const pos_y = Array.apply(null, Array(eventsNum)).map(function (_, i) {return i*step;});
+    const step = 100 / eventsNum;
+    const pos_y = Array.apply(null, Array(eventsNum)).map(function (_, i) { return i * step; });
 
     for (const eventId in sharedEvents) {
       const idx = Object.keys(sharedEvents).indexOf(eventId);
@@ -308,7 +309,7 @@ class Graph {
           scale: 2,
           type: "event"
         },
-        position: {x:100,y:pos_y[idx]}
+        position: { x: 100, y: pos_y[idx] }
       });
 
       // edges
@@ -336,7 +337,7 @@ class Graph {
     this.cy.add(elements);
 
     if (this.viewMode === VIEW_MODE_OVERVIEW) {
-      this.cy.nodes().forEach(node=>{
+      this.cy.nodes().forEach(node => {
         const content = [
           `<h3>${node.id()}</h3>`,
           "<hr>",
@@ -348,15 +349,15 @@ class Graph {
           "</h5>",
         ].join("\n");
 
-        const tippy = makeTooltip(node,content,"bottom");
-        node.data("tippy",tippy);
-        node.on("tap",()=> {
+        const tippy = makeTooltip(node, content, "bottom");
+        node.data("tippy", tippy);
+        node.on("tap", () => {
           tippy.show();
           this.cy.nodes().not(node).forEach(hideTooltip);
         });
       });
     } else {
-      this.cy.nodes().filter("[type = 'event']").forEach(node=>{
+      this.cy.nodes().filter("[type = 'event']").forEach(node => {
         const content = [
           "<h3>Articles:</h3>",
           "<ul>",
@@ -365,9 +366,9 @@ class Graph {
           "</ul>"
         ].join("\n");
 
-        const tippy = makeTooltip(node,content,"right");
-        node.data("tippy",tippy);
-        node.on("tap",()=> {
+        const tippy = makeTooltip(node, content, "right");
+        node.data("tippy", tippy);
+        node.on("tap", () => {
           tippy.show();
           this.cy.nodes().not(node).forEach(hideTooltip);
         });
