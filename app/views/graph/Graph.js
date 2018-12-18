@@ -17,6 +17,8 @@ const VIEW_MODE_DETAILS = 1;
 const NODE_SOURCE_COLOR = "#495149";
 const NODE_EVENT_COLOR = "orange";
 
+const RED = "#a20417";
+const GREEN = "#007144";
 
 class Graph {
   constructor(mainContext, paramContext) {
@@ -27,12 +29,13 @@ class Graph {
     this.generalElements = Array();
     this.viewMode = undefined;
 
-    // Parameters for the graph
+    // Initial parameters for the graph
     this.config = {
       maxNbNodes: 13,
       bestNEdges: 3,
       minNbSharedEventEdge: 1,
       toneDistThreshold: 1,
+      posNegThreshold: 0
     };
   }
 
@@ -40,7 +43,7 @@ class Graph {
     const self = this;
     dataManagerInstance.subscribe(this);
     if (typeof this.paramContext !== "undefined") {
-      new GraphParamBox(this, this.paramContext, this.config);
+      this.graphParamBox = new GraphParamBox(this, this.paramContext, this.config);
     }
 
     const divZoomBack = document.createElement("div");
@@ -181,9 +184,62 @@ class Graph {
     this.processAndDisplay();
   }
 
+  /**
+   * Function to set the edges color dynamically
+   *
+   * @memberof Graph
+   */
+  setColorsDynamically() {
+    if (this.viewMode === VIEW_MODE_OVERVIEW) {
+      this.cy.edges().forEach(edge => {
+        const color = edge.data("meanToneDist") > this.config.toneDistThreshold ? RED : GREEN;
+        edge.data("color", color);
+      });
+    } else if (this.viewMode === VIEW_MODE_DETAILS) {
+      this.cy.edges().forEach(edge => {
+        const color = edge.data("tone") < this.config.posNegThreshold ? RED : GREEN;
+        edge.data("color", color);
+      });
+
+      // set event nodes colors
+      this.cy.nodes(".event").forEach(node => {
+        const edges = node.connectedEdges();
+        const colors = edges.map(edge => edge.data("color"));
+        if (colors[0] === colors[1]){
+          node.data("color", colors[0]);
+        } else {
+          node.data("color", "grey");
+        }
+      });
+    }
+  }
+
+  /**
+   * Updates the graph config
+   *
+   * @param {object} config
+   * @memberof Graph
+   */
   updateConfig(config) {
+    // Function to compare the configurations and see
+    // if wee need to recompute edges and nodes
+    // Or if only color should change.
+    function isFullRefreshNeeded(prev, curr) {
+      for (const key in prev) {
+        if (!["toneDistThreshold", "posNegThreshold"].includes(key)) {
+          if (prev[key] !== curr[key]) return true;
+        }
+      }
+      return false;
+    }
+    const refreshNeeded = isFullRefreshNeeded(this.config, config);
+
     this.config = config;
-    this.processAndDisplay(this.config);
+    if (refreshNeeded) {
+      this.processAndDisplay(this.config);
+    } else {
+      this.setColorsDynamically();
+    }
   }
 
   processAndDisplay(config = this.config) {
@@ -245,7 +301,8 @@ class Graph {
                 source: source1,
                 target: source2,
                 width: Math.exp(1 + 2 * (eventsSharedCount / maxSharedEventsCount)) / 6,
-                color: meanToneDist > this.config.toneDistThreshold ? "  #a20417" : " #007144",
+                meanToneDist,
+                color: "grey",
                 dist: meanToneDist,
               }
             });
@@ -257,8 +314,11 @@ class Graph {
   }
 
   displayGeneralView() {
-    hideAllTooltips(this.cy);
     this.viewMode = VIEW_MODE_OVERVIEW;
+    if (this.graphParamBox) {
+      this.graphParamBox.setWeAreInSecondaryView(false);
+    }
+    hideAllTooltips(this.cy);
     this.updateViz(this.generalElements);
   }
 
@@ -270,6 +330,11 @@ class Graph {
    * @memberof Graph
    */
   displayPreciseView(source1, source2) {
+    this.viewMode = VIEW_MODE_DETAILS;
+
+    if (this.graphParamBox) {
+      this.graphParamBox.setWeAreInSecondaryView(true);
+    }
     const source1_node = Object.entries(this.rawData.nodes).find(e => {
       return e[0] === source1;
     });
@@ -303,37 +368,43 @@ class Graph {
 
     for (const eventId in sharedEvents) {
       const idx = Object.keys(sharedEvents).indexOf(eventId);
+
+      const { url1, url2, avgTone1, avgTone2 } = sharedEvents[eventId];
+
       // event node
       elements.push({
         group: "nodes", data: {
           id: eventId,
           color: NODE_EVENT_COLOR,
           scale: 2,
+          label: "todo",
           source1,
           source2,
-          url1: sharedEvents[eventId].url1,
-          url2: sharedEvents[eventId].url2,
+          url1,
+          url2,
           type: "event"
         },
-        position: { x: 100, y: pos_y[idx] }
+        position: { x: 100, y: pos_y[idx] },
+        classes: "event"
       });
 
       // edges
-      [source1, source2].forEach(source => {
+      [[source1, avgTone1], [source2, avgTone2]].forEach(d => {
+        const [source, tone] = d;
         elements.push({
           group: "edges", data: {
             id: `${eventId}%${source}`,
             source: source,
             target: eventId,
             width: 0.3,
-            color: "red",
+            color: "grey",
+            tone,
             dist: 1,
           }
         });
       });
 
     }
-    this.viewMode = VIEW_MODE_DETAILS;
     this.updateViz(elements);
   }
 
@@ -401,6 +472,8 @@ class Graph {
     } else {
       throw new Error("Not supported");
     }
+
+    this.setColorsDynamically();
   }
 }
 
