@@ -37,7 +37,7 @@ class StackedGraph {
 
     this.axis = svg.append("g")
       .attr("id", "stackedAxis")
-      .attr("transform", "translate(0, 400)");
+      .attr("transform", "translate(0, 450)");
 
     dataManagerInstance.subscribe(this);
   }
@@ -65,22 +65,42 @@ class StackedGraph {
   }
 
   generateStreamgraph() {
+    d3.select("#linkToGlobalView a")
+      .style("visibility", "hidden")
+      .on("click", null);
+
     const stack = d3.stack()
       .keys(this.active.layerIDs)
       .order(d3.stackOrderInsideOut)
       .offset(d3.stackOffsetWiggle);
     const data = stack(this.data.streamgraph);
 
+    //let chroma = (k, i) => d3.interpolateYlGnBu(i / this.active.layerIDs.length)
+    let chroma = (k, i) => d3.schemeSet3[i];
+
     this.updateLegend(
-      data.concat().sort((a, b) => b.index - a.index).map((d) => d.key)
+      data.concat().sort((a, b) => b.index - a.index).map((d) =>
+        [d.key, d.index, chroma(d.key, d.index)])
     );
 
     this.updateViz(
-      data, (d, i) => d3.interpolateYlGnBu(i / this.active.layerIDs.length)
+      data, chroma
     ).on("click", (d) => this.generateDrilldown(d.key));
   }
 
   generateDrilldown(k) {
+    d3.selectAll(".list-group-item")
+      .style("background-color", "initial");
+    const legendItem = d3.select(`#${this.getLegendElemId(k)}`);
+    legendItem.style("background-color", legendItem.attr("data-color"));
+
+    d3.select("#linkToGlobalView a")
+      .style("visibility", "visible")
+      .on("click", () => {
+        d3.event.preventDefault();
+        this.generateStreamgraph();
+      });
+
     const stack = d3.stack()
       .keys([true, false])
       .value((d, k) => k ? d[k] : -Math.max(0.0001, d[k]))
@@ -89,11 +109,14 @@ class StackedGraph {
     const data = stack(this.data.drilldown[k]);
 
     this.updateViz(
-      data, (d) => d.key ? d3.rgb(0, 168, 107) : d3.rgb(185, 14, 10)
-    ).on("click", null);
+      data, (k) => k ? d3.rgb(0, 168, 107) : d3.rgb(185, 14, 10), k
+    )
+      .on("mouseover", null)
+      .on("mouseout", null)
+      .on("click", null);
   }
 
-  updateViz(data, chroma) {
+  updateViz(data, chroma, source) {
     const x = d3.scaleTime()
       .domain([d3.min(this.data.dates), d3.max(this.data.dates)])
       .range([0, 1000]);
@@ -102,7 +125,7 @@ class StackedGraph {
         d3.min(data, g => d3.min(g, d => d[0])),
         d3.max(data, g => d3.max(g, d => d[1]))
       ])
-      .range([400, 0]);
+      .range([450, 0]);
 
     const area = d3.area()
       .curve(d3.curveBasis)
@@ -136,10 +159,11 @@ class StackedGraph {
       .data(data);
     u.enter().append("path")
         .classed("stackedLayer", true)
+        .attr("id", (d) => this.getLayerId(d.key))
         .attr("d", nullArea)
         .attr("opacity", 0)
       .merge(u)
-        .attr("fill", (d, i) => chroma(d, i))
+        .attr("fill", (d) => chroma(d.key, d.index))
         .call(animateLayers, 1200, area, 1);
 
     u.exit()
@@ -152,19 +176,47 @@ class StackedGraph {
       .ease(d3.easeQuadOut)
       .call(d3.axisBottom().scale(x));
 
+    function highlightLayer(path, key, index, on, legendItem, color) {
+      legendItem.call(fadeLegend, 200, color);
+      if (on) {
+        legendItem.style("cursor", "pointer");
+        path.style("cursor", "pointer")
+          .call(fadeLayers, 200, (d) => d.index != index ? 0.3 : 1);
+      } else {
+        legendItem.style("cursor", "default");
+        path.style("cursor", "default")
+          .call(fadeLayers, 200, 1);
+      }
+    }
+
     const layers = this.chart.selectAll(".stackedLayer");
     layers
-      .on("mouseover", (d, i) => {
-        d3.select(`#${this.getLegendElemId(d.key)}`)
-          .call(fadeLegend, 200, chroma(d, i));
-        layers.style("cursor", "pointer")
-          .call(fadeLayers, 200, (d, j) => j != i ? 0.3 : 1);
+      .on("mouseover", (d) => {
+        const legendItem = d3.select(`#${this.getLegendElemId(d.key)}`);
+        layers.call(highlightLayer, d.key, d.index, true, legendItem, legendItem.attr("data-color"));
       })
       .on("mouseout", (d) => {
-        d3.select(`#${this.getLegendElemId(d.key)}`)
-          .call(fadeLegend, 200, "initial");
-        layers.style("cursor", "default")
-          .call(fadeLayers, 200, 1);
+        const legendItem = d3.select(`#${this.getLegendElemId(d.key)}`);
+        layers.call(highlightLayer, -1, -1, false, legendItem, "initial");
+      });
+    const legendLayers = this.legend.selectAll(".list-group-item");
+    const context = this;
+    legendLayers
+      .on("mouseover", function() {
+        const legendItem = d3.select(this);
+        layers.call(highlightLayer, this.dataset.key, this.dataset.index,
+          true, legendItem, this.dataset.color);
+      })
+      .on("mouseout", function() {
+        const legendItem = d3.select(this);
+        if (typeof source == "undefined" || this.dataset.key !== source) {
+          layers.call(highlightLayer, -1, -1, false, legendItem, "initial");
+        } else {
+          layers.call(highlightLayer, -1, -1, false, legendItem, this.dataset.color);
+        }
+      })
+      .on("click", function() {
+        context.generateDrilldown(this.dataset.key);
       });
     return layers;
   }
@@ -173,14 +225,21 @@ class StackedGraph {
     this.legend.html("");
     layerIDs.forEach((s) =>
       this.legend.append("li")
-        .attr("id", this.getLegendElemId(s))
+        .attr("id", this.getLegendElemId(s[0]))
+        .attr("data-key", s[0])
+        .attr("data-index", s[1])
+        .attr("data-color", s[2])
         .classed("list-group-item", true)
-        .html(s)
+        .html(s[0])
     );
   }
 
+  getLayerId(source) {
+    return `stackedPlotLayer-${source}`;
+  }
+
   getLegendElemId(source) {
-    return `dashboardStackedGraph-${source.split(".")[0]}`;
+    return `stackedLegendItem-${source}`;
   }
 }
 
