@@ -12,7 +12,7 @@
 
   #dashboardStackedGraphLegend{
     flex:1;
-    min-width: 50px;
+    min-width: 150px;
 
     #linkToGlobalView {
       font-size: 0.7rem;
@@ -21,8 +21,8 @@
 
     .list-group-item{
       font-size: 0.8rem;
-      padding-top: 0.75vh;
-      padding-bottom: 0.75vh;
+      padding-top: 0.5vw;
+      padding-bottom: 0.5vw;
     }
   }
 

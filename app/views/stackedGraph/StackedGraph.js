@@ -111,12 +111,16 @@ class StackedGraph {
     this.updateViz(
       data, (k) => k ? d3.rgb(0, 168, 107) : d3.rgb(185, 14, 10), k
     )
-      .on("mouseover", null)
-      .on("mouseout", null)
+      //.on("mouseover", null)
+      //.on("mouseout", null)
       .on("click", null);
   }
 
   updateViz(data, chroma, source) {
+    d3.select("#stackedVertical").remove();
+    d3.select("#stackedTooltip").remove();
+    d3.select("#stackedTooltipText").remove();
+
     const x = d3.scaleTime()
       .domain([d3.min(this.data.dates), d3.max(this.data.dates)])
       .range([0, 1000]);
@@ -181,7 +185,7 @@ class StackedGraph {
       if (on) {
         legendItem.style("cursor", "pointer");
         path.style("cursor", "pointer")
-          .call(fadeLayers, 200, (d) => d.index != index ? 0.3 : 1);
+          .call(fadeLayers, 200, (d) => d.index != index ? 0.5 : 1);
       } else {
         legendItem.style("cursor", "default");
         path.style("cursor", "default")
@@ -189,15 +193,73 @@ class StackedGraph {
       }
     }
 
+    const vertical = this.chart.append("line")
+      .attr("id", "stackedVertical")
+      .attr("x1", 0)
+      .attr("y1", 0)
+      .attr("x2", 0)
+      .attr("y2", 450)
+      .style("stroke-width", 1)
+      .style("stroke", "gray")
+      .style("fill", "none")
+      .style("display", "none");
+
+    const tooltipG = this.chart.append("g");
+    const tooltip = tooltipG.append("rect")
+      .attr("id", "stackedTooltip")
+      .attr("x", 50)
+      .attr("y", 50)
+      .attr("width", 50)
+      .attr("height", 30)
+      .attr("fill", "white")
+      .attr("stroke", "gray")
+      .attr("stroke-width", 1)
+      .attr("rx", 15)
+      .attr("ry", 15)
+      .style("display", "none");
+    const tooltipText = tooltipG.append("text")
+      .attr("id", "stackedTooltipText")
+      .attr("x", 75)
+      .attr("y", 70)
+      .attr("text-anchor", "middle")
+      .text("Hi!")
+      .style("display", "none");
+
     const layers = this.chart.selectAll(".stackedLayer");
+    const firstDate = d3.min(this.data.dates);
     layers
       .on("mouseover", (d) => {
-        const legendItem = d3.select(`#${this.getLegendElemId(d.key)}`);
-        layers.call(highlightLayer, d.key, d.index, true, legendItem, legendItem.attr("data-color"));
+        if (typeof source == "undefined") {
+          const legendItem = d3.select(`#${this.getLegendElemId(d.key)}`);
+          layers.call(highlightLayer, d.key, d.index, true, legendItem, legendItem.attr("data-color"));
+        }
+        vertical.style("display" , "initial");
+        tooltip.style("display" , "initial");
+        tooltipText.style("display" , "initial");
+      })
+      .on("mousemove", function(d) {
+        const coordinates = d3.mouse(this);
+        const dateIndex = x.invert(coordinates[0]).getHours() - firstDate.getHours();
+        const count = d[dateIndex].data[d.key];
+        vertical
+          .attr("x1", coordinates[0]-2)
+          .attr("x2", coordinates[0]-2);
+        tooltip
+          .attr("x", coordinates[0]+10)
+          .attr("y", coordinates[1]-50);
+        tooltipText
+          .attr("x", coordinates[0]+35)
+          .attr("y", coordinates[1]-30)
+          .text(count);
       })
       .on("mouseout", (d) => {
-        const legendItem = d3.select(`#${this.getLegendElemId(d.key)}`);
-        layers.call(highlightLayer, -1, -1, false, legendItem, "initial");
+        if (typeof source == "undefined") {
+          const legendItem = d3.select(`#${this.getLegendElemId(d.key)}`);
+          layers.call(highlightLayer, -1, -1, false, legendItem, "initial");
+        }
+        vertical.style("display" , "none");
+        tooltip.style("display" , "none");
+        tooltipText.style("display" , "none");
       });
     const legendLayers = this.legend.selectAll(".list-group-item");
     const context = this;
