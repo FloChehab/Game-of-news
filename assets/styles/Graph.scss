@@ -1,6 +1,11 @@
+@import url('https://fonts.googleapis.com/css?family=Special+Elite');
 .btn-graph-zoom-out {
   position: absolute;
   top: 10px;
   left: 10px;
   z-index: 1;
+}
+
+#dashboardGraph {
+  background-image: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
 }

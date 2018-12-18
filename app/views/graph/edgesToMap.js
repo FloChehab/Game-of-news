@@ -1,6 +1,6 @@
 
 /**
- * Function that generate a map, with for each node you have a list of
+ * Function that generates a map, where for each node you have a list of
  * [nodeConnected, {meanToneDist, eventsSharedCount}]
  *
  * @param {Array[string]} nodes
