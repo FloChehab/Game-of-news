@@ -9,6 +9,7 @@ import { buildEdgeId } from "./Ids";
 import "../../../assets/styles/Graph.scss";
 import { edgesToMap } from "./edgesToMap";
 import { GraphParamBox } from "./paramBox";
+import {makeTooltip} from "./tooltip";
 
 
 const VIEW_MODE_OVERVIEW = 0;
@@ -197,6 +198,7 @@ class Graph {
       });
     });
 
+
     // Handling edges
     const nodesNames = nodes.map(el => el[0]);
     const edgesMap = edgesToMap(nodesNames, edgesInfo);
@@ -291,6 +293,14 @@ class Graph {
   updateViz(elements) {
     this.cy.elements().remove();
     this.cy.add(elements);
+
+    this.cy.nodes().forEach(node=>{
+      node.on("tap",()=> {
+        const tippy = makeTooltip(node,"hello world");
+        tippy.show();
+        console.log("tap");
+      });
+    });
 
     if (this.viewMode === VIEW_MODE_OVERVIEW) {
       this.cy.layout({
