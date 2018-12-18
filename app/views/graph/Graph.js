@@ -205,8 +205,7 @@ class Graph {
     // Take the top nodes and limit to maxNbNodes
     let nodes = Array.sort(
       Object.entries(nodesIds),
-      (a, b) => b[1] - a[1]
-    );
+      (a, b) => b[1].mentionnedEventsCount - a[1].mentionnedEventsCount);
     nodes = nodes.slice(0, config.maxNbNodes);
 
     nodes.forEach(el => {
@@ -215,8 +214,9 @@ class Graph {
           id: el[0],
           label: el[0].split(".")[0],
           color: NODE_SOURCE_COLOR,
-          scale: 8 * el[1] / maxSharedEventsCount,
-          sharedEventsCount: el[1],
+          scale: 8 * el[1].mentionnedEventsCount / maxSharedEventsCount,
+          mentionnedEventsCount: el[1].mentionnedEventsCount,
+          avgTone: el[1].avgTone
         }
       });
     });
@@ -276,8 +276,10 @@ class Graph {
     const source2_node = Object.entries(this.rawData.nodes).find(e => {
       return e[0] === source2;
     });
+
     let elements = Array();
 
+    // TODO: what are the 0 and 100 not clear (I have an idea but still)
     [[source1_node, 0], [source2_node, 200]].forEach((node) => {
       elements.push({
         group: "nodes", data: {
@@ -307,6 +309,10 @@ class Graph {
           id: eventId,
           color: NODE_EVENT_COLOR,
           scale: 2,
+          source1,
+          source2,
+          url1: sharedEvents[eventId].url1,
+          url2: sharedEvents[eventId].url2,
           type: "event"
         },
         position: { x: 100, y: pos_y[idx] }
@@ -338,16 +344,15 @@ class Graph {
 
     if (this.viewMode === VIEW_MODE_OVERVIEW) {
       this.cy.nodes().forEach(node => {
-        const content = [
-          `<h3>${node.id()}</h3>`,
-          "<hr>",
-          "<ul>",
-          "<h5>",
-          `<li><span class="badge badge-secondary">${node.data("sharedEventsCount")}</span>shared events</li>`,
-          `<li><span class="badge badge-secondary">${node.degree()}</span>common outlets</li>`,
-          "</ul>",
-          "</h5>",
-        ].join("\n");
+        const content = `
+          <h3>${node.id()}</h3>
+          <hr>
+          <h5>
+            Has mentionned <span class="badge badge-secondary">${node.data("mentionnedEventsCount")}</span> events. <br>
+            <span class="badge badge-secondary">${node.data("avgTone")}</span> is the average tone of the <br> articles mentionning those events.<br>
+            Has <span class="badge badge-secondary">${node.degree()}</span> common outlets in the graph
+          </h5>
+        `;
 
         const tippy = makeTooltip(node, content, "bottom");
         node.data("tippy", tippy);
@@ -358,13 +363,11 @@ class Graph {
       });
     } else {
       this.cy.nodes().filter("[type = 'event']").forEach(node => {
-        const content = [
-          "<h3>Articles:</h3>",
-          "<ul>",
-          "<li>Link 1</li>",
-          "<li>Link 2</li>",
-          "</ul>"
-        ].join("\n");
+        const content = `
+          <h3>Articles related to this event</h3>
+          <a target="_blank" href="${node.data("url1")}">From ${node.data("source1")}</a> <br>
+          <a target="_blank" href="${node.data("url2")}">From ${node.data("source2")}</a>
+        `;
 
         const tippy = makeTooltip(node, content, "right");
         node.data("tippy", tippy);
