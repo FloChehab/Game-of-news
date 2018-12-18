@@ -205,7 +205,7 @@ class Graph {
       this.cy.nodes(".event").forEach(node => {
         const edges = node.connectedEdges();
         const colors = edges.map(edge => edge.data("color"));
-        if (colors[0] === colors[1]){
+        if (colors[0] === colors[1]) {
           node.data("color", colors[0]);
         } else {
           node.data("color", "grey");
@@ -226,15 +226,17 @@ class Graph {
     // Or if only color should change.
     function isFullRefreshNeeded(prev, curr) {
       for (const key in prev) {
-        if (!["toneDistThreshold", "posNegThreshold"].includes(key)) {
-          if (prev[key] !== curr[key]) return true;
+        if (key !== "toneDistThreshold" && key !== "posNegThreshold") {
+          if (prev[key] !== curr[key]) {
+            return true;
+          }
         }
       }
       return false;
     }
     const refreshNeeded = isFullRefreshNeeded(this.config, config);
 
-    this.config = config;
+    Object.assign(this.config, config);
     if (refreshNeeded) {
       this.processAndDisplay(this.config);
     } else {

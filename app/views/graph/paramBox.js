@@ -54,7 +54,7 @@ Slider.propTypes = {
 
 export class GraphParamBox {
   constructor(parent, container, config) {
-    this.config = config;
+    this.config = Object.assign({}, config); // make a copy to prevent bugs with object being references
     this.parent = parent;
     this.container = container;
     this.init(this.container);
@@ -97,7 +97,7 @@ export class GraphParamBox {
                   step: 1,
                 }}
                 value={this.config.maxNbNodes}
-                onChange={(maxNbNodes) => this.updateConfig({ maxNbNodes })}
+                onChange={(val) => this.updateConfig({ maxNbNodes: +val })}
                 className="param"
                 key={2}
               />
@@ -110,7 +110,7 @@ export class GraphParamBox {
                   step: 1,
                 }}
                 value={this.config.bestNEdges}
-                onChange={(bestNEdges) => this.updateConfig({ bestNEdges })}
+                onChange={(val) => this.updateConfig({ bestNEdges: +val })}
                 className="param"
                 key={3}
               />
@@ -123,7 +123,7 @@ export class GraphParamBox {
                   step: 1,
                 }}
                 value={this.config.minNbSharedEventEdge}
-                onChange={(minNbSharedEventEdge) => this.updateConfig({ minNbSharedEventEdge })}
+                onChange={(val) => this.updateConfig({ minNbSharedEventEdge: +val })}
                 className="param"
                 key={4}
               />
@@ -136,7 +136,7 @@ export class GraphParamBox {
                   step: 0.02,
                 }}
                 value={this.config.toneDistThreshold}
-                onChange={(toneDistThreshold) => this.updateConfig({ toneDistThreshold })}
+                onChange={(val) => this.updateConfig({ toneDistThreshold: +val })}
                 className="param"
                 key={5}
               />
@@ -147,10 +147,7 @@ export class GraphParamBox {
   }
 
   updateConfig(config) {
-    for (const conf in config) {
-      this.config[conf] = config[conf];
-    }
-
+    Object.assign(this.config, config);
     this.parent.updateConfig(this.config);
   }
 
