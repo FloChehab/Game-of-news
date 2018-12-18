@@ -51,11 +51,8 @@ class StackedGraph {
     this.data = update;
 
     // Update viz data
-    this.active.layerIDs = (() => {
-      const ids = Object.keys(update.streamgraph[0]);
-      ids.pop("mentionInterval");
-      return ids;
-    })();
+    this.active.layerIDs = Object.keys(update.streamgraph[0])
+      .filter(id => id !== "mentionInterval");
     this.active.nullStack = (() => d3.stack().keys(["nullArea"])(
       this.data.dates.map((d) => ({mentionInterval: d, nullArea: true})))[0]
     )();
