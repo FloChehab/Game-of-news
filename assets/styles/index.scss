@@ -34,6 +34,23 @@ body {
   }
 }
 
+#buttonDownloadDataset {
+  margin-left: 1em;
+}
+
+#restoreDatasetDiv {
+  margin-top: 0.5em;
+  text-align: center;
+}
+
+#dashboardGraphContainer{
+  margin-bottom: 1em;
+}
+
+#dashboardGraph {
+  height: 70vh;
+}
+
 .vert-margin {
   margin-top: 10px;
   margin-bottom: 10px;
