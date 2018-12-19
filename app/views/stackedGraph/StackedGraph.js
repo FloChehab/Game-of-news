@@ -202,7 +202,8 @@ class StackedGraph {
       .style("stroke-width", 1)
       .style("stroke", "gray")
       .style("fill", "none")
-      .style("display", "none");
+      .style("display", "none")
+      .style("pointer-events", "none");
 
     const tooltipG = this.chart.append("g");
     const tooltip = tooltipG.append("rect")
@@ -216,14 +217,18 @@ class StackedGraph {
       .attr("stroke-width", 1)
       .attr("rx", 15)
       .attr("ry", 15)
-      .style("display", "none");
+      .style("display", "none")
+      .style("pointer-events", "none");
+
+
     const tooltipText = tooltipG.append("text")
       .attr("id", "stackedTooltipText")
       .attr("x", 75)
       .attr("y", 70)
       .attr("text-anchor", "middle")
       .text("Hi!")
-      .style("display", "none");
+      .style("display", "none")
+      .style("pointer-events", "none");
 
     const layers = this.chart.selectAll(".stackedLayer");
     const firstDate = d3.min(this.data.dates);
@@ -253,7 +258,7 @@ class StackedGraph {
           .text(count);
       })
       .on("mouseout", (d) => {
-        if (typeof source == "undefined") {
+        if (typeof source === "undefined") {
           const legendItem = d3.select(`#${this.getLegendElemId(d.key)}`);
           layers.call(highlightLayer, -1, -1, false, legendItem, "initial");
         }
