@@ -16,7 +16,7 @@ export default class ViewMode extends React.Component {
       els: [
         { id: "both", label: "Both views", checked: true, showGraph: true, showStream: true },
         { id: "graph", label: "Graph only", checked: false, showGraph: true, showStream: false },
-        { id: "stream", label: "Stream graph only", checked: false, showGraph: false, showStream: true }
+        { id: "stream", label: "Streamgraph only", checked: false, showGraph: false, showStream: true }
       ]
     };
   }
