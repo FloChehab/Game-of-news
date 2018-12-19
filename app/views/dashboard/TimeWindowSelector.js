@@ -89,12 +89,12 @@ class TimeWindowSelector {
     this.xScale.domain(newDomain);
 
     this.xAxisGrid = d3.axisBottom(this.xScale)
-      .ticks(d3.utcHour, 1)
+      .ticks(d3.timeHour, 1)
       .tickSize(-height)
       .tickFormat(function () { return null; });
 
     this.xAxisLabel = d3.axisBottom(this.xScale)
-      .ticks(d3.utcHour.every(3))
+      .ticks(d3.timeHour.every(3))
       .tickPadding(3);
   }
 
