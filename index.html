@@ -76,10 +76,10 @@
 
         <div id="dashboardGraphContainer">
           <div id="dashboardGraphParams"></div>
-          <div id="dashboardGraph"></div>
+          <div id="dashboardGraph" class="view"></div>
         </div>
 
-        <div id="dashboardStackedGraphContainer" class="container-fluid">
+        <div id="dashboardStackedGraphContainer" class="container-fluid view">
           <div id="dashboardStackedGraphLegend">
             <ul id="dashboardStackedGraphSources" class="list-group">
             </ul>
@@ -89,7 +89,7 @@
               </a>
             </div>
           </div>
-          <div id="dashboardStackedGraphPlot"></div>
+          <div id="dashboardStackedGraphPlot" ></div>
         </div>
 
         <div class="c-section__footer p-2 fluid-width-container">
@@ -122,7 +122,7 @@
                 <div id='timeWindowSelector' class='timeWindowSelectorAvailable'></div>
                 <div class="datePicker">
                   <label for="dateTimeWindowSelector">Center window on:</label>
-                  <input id='dateTimeWindowSelector' type='date' required pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" />
+                  <input id='dateTimeWindowSelector' type='date' class="form-control" required pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" />
                 </div>
               </div>
 
