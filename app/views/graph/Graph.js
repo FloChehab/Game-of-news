@@ -67,6 +67,7 @@ class Graph {
           selector: "node",
           style: {
             "background-color": "data(color)",
+            "background-opacity": 0,
             "label": "data(label)",
             "text-valign": "center",
             "width": "data(scale)",
