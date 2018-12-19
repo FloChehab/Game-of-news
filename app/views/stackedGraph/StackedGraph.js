@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import dataManagerInstance from "../../fetchData/DataManager";
+import { getDataHover } from "./getDataHover";
 import "../../../assets/styles/StackedGraph.scss";
 
 class StackedGraph {
@@ -43,9 +44,18 @@ class StackedGraph {
   }
 
   updateData(data) {
-    // Handle incoming data
-    const update = data.stackedGraph;
+    // Handle incoming data dates
+    let update = data.stackedGraph;
     update.dates = update.dates.map((d) => new Date(d));
+    for (let site in update.drilldown) {
+      for (let interval of update.drilldown[site]) {
+        interval.mentionInterval = new Date(interval.mentionInterval);
+      }
+    }
+
+    for (let obj of update.streamgraph) {
+      obj.mentionInterval = new Date(obj.mentionInterval);
+    }
 
     // Update view data
     this.data = update;
@@ -133,7 +143,7 @@ class StackedGraph {
 
     const area = d3.area()
       .curve(d3.curveBasis)
-      .x((d) => x(new Date(d.data.mentionInterval)))
+      .x((d) => x(d.data.mentionInterval))
       .y0((d) => d.data.nullArea ? y(0) : y(d[0]))
       .y1((d) => d.data.nullArea ? y(0) : y(d[1]));
     const nullArea = area(this.active.nullStack);
@@ -202,7 +212,8 @@ class StackedGraph {
       .style("stroke-width", 1)
       .style("stroke", "gray")
       .style("fill", "none")
-      .style("display", "none");
+      .style("display", "none")
+      .style("pointer-events", "none");
 
     const tooltipG = this.chart.append("g");
     const tooltip = tooltipG.append("rect")
@@ -216,17 +227,21 @@ class StackedGraph {
       .attr("stroke-width", 1)
       .attr("rx", 15)
       .attr("ry", 15)
-      .style("display", "none");
+      .style("display", "none")
+      .style("pointer-events", "none");
+
+
     const tooltipText = tooltipG.append("text")
       .attr("id", "stackedTooltipText")
       .attr("x", 75)
       .attr("y", 70)
       .attr("text-anchor", "middle")
-      .text("Hi!")
-      .style("display", "none");
+      .text("")
+      .style("display", "none")
+      .style("pointer-events", "none");
 
     const layers = this.chart.selectAll(".stackedLayer");
-    const firstDate = d3.min(this.data.dates);
+    // const firstDate = d3.min(this.data.dates);
     layers
       .on("mouseover", (d) => {
         if (typeof source == "undefined") {
@@ -238,9 +253,14 @@ class StackedGraph {
         tooltipText.style("display" , "initial");
       })
       .on("mousemove", function(d) {
+        // console.log(d)
         const coordinates = d3.mouse(this);
-        const dateIndex = x.invert(coordinates[0]).getHours() - firstDate.getHours();
-        const count = d[dateIndex].data[d.key];
+        const verticalDate = x.invert(coordinates[0]);
+        const allData = d.map( v => v.data );
+        // console.log(verticalDate)
+        // const dateIndex = nearestHourDate(verticalDate).getHours() - firstDate.getHours();
+        const count = Math.round(getDataHover(verticalDate, allData, d.key));
+
         vertical
           .attr("x1", coordinates[0]-2)
           .attr("x2", coordinates[0]-2);
@@ -250,12 +270,12 @@ class StackedGraph {
         tooltipText
           .attr("x", coordinates[0]+35)
           .attr("y", coordinates[1]-30)
-          .text(count);
+          .text("≈" + count);
       })
       .on("mouseout", (d) => {
-        if (typeof source == "undefined") {
+        if (typeof source === "undefined") {
           const legendItem = d3.select(`#${this.getLegendElemId(d.key)}`);
-          layers.call(highlightLayer, -1, -1, false, legendItem, "initial");
+          layers.call(highlightLayer, -1, -1, false, legendItem, "white");
         }
         vertical.style("display" , "none");
         tooltip.style("display" , "none");

@@ -9,6 +9,7 @@ import Graph from "../graph/Graph";
 import StackedGraph from "../stackedGraph/StackedGraph";
 import ViewMode from "./ViewMode";
 import { downloadObjectAsJson } from "./utils/downloadObjectAsJson";
+import "../../../assets/styles/Dashboard.scss";
 
 /**
  * Function to capitalize a string (first letter of the string is uppercase)
