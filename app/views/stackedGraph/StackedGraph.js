@@ -10,18 +10,21 @@ class StackedGraph {
     this.chart = {};
     this.axis = {};
 
-    //French Palette by Lea Poisson (https://flatuicolors.com/palette/fr)
+    // Inspired by: https://matplotlib.org/examples/color/colormaps_reference.html
+    // Set3 with a bit more saturation and some inversion in the last color to remove the grey.
     this.colors = [
-      d3.rgb(229, 80, 57),
-      d3.rgb(246, 185, 59),
-      d3.rgb(250, 211, 144),
-      d3.rgb(248, 194, 145),
-      d3.rgb(106, 137, 204),
-      d3.rgb(130, 204, 221),
-      d3.rgb(184, 233, 148),
-      d3.rgb(120, 224, 143),
-      d3.rgb(96, 163, 188),
-      d3.rgb(74, 105, 189)
+      "#6bd8c8",
+      "#feff92",
+      "#beb9e7",
+      "#fe655c",
+      "#64b4e5",
+      "#feac2b",
+      "#a0e326",
+      "#ffc7ea",
+      "#feee0e",
+      "#cb75ce",
+      // "#d9d9d9",
+      // "#c3eeb8",
     ];
 
     // Current data provided by the Data Manager
