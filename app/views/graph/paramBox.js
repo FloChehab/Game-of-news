@@ -27,8 +27,14 @@ class Slider extends React.Component {
 
     return (
       <div className={this.props.className}>
-        <label htmlFor={rangeId} style={{ marginBottom: 0, display: "block" }}>
-          {this.props.labelText}: {this.state.value}
+
+        <label
+          htmlFor={rangeId}
+          style={{ marginBottom: 0, display: "block" }}
+          data-toggle="tooltip"
+          data-placement="top"
+          title={this.props.tooltip}>
+          {this.props.labelTextLeft} <span className="badge badge-secondary">{this.state.value}</span> {this.props.labelTextRight}
         </label>
         <input
           type="range"
@@ -45,10 +51,12 @@ class Slider extends React.Component {
 }
 
 Slider.propTypes = {
-  labelText: Proptypes.string,
+  labelTextLeft: Proptypes.string,
+  labelTextRight: Proptypes.string,
   inputProps: Proptypes.object,
   onChange: Proptypes.func,
-  value: Proptypes.number
+  value: Proptypes.number,
+  tooltip: Proptypes.string
 };
 
 
@@ -73,7 +81,9 @@ export class GraphParamBox {
           this.secondaryView ?
             <div className="graphParamContainer">
               <Slider
-                labelText={"Positive/negative tone threshold"}
+                labelTextLeft={"Set the red/green tone threshold to"}
+                labelTextRight={"."}
+                tooltip={"If the average tone of the articles of the news source for an event is lower than the threshold, then the corresponding edge is red; it's green otherwise."}
                 inputProps={{
                   min: -10,
                   max: 10,
@@ -90,7 +100,9 @@ export class GraphParamBox {
 
             <div className="graphParamContainer">
               <Slider
-                labelText={"Number of nodes (best nodes in terms of shared events)"}
+                labelTextLeft={"Display the top"}
+                labelTextRight={"news sources."}
+                tooltip={"The 'top news sources' are the biggest ones in terms of number of different events shared."}
                 inputProps={{
                   min: 2,
                   max: CONFIG.GRAPH_MAX_NB_NODES,
@@ -103,7 +115,9 @@ export class GraphParamBox {
               />
 
               <Slider
-                labelText={"Max number of edges per node (biggest)"}
+                labelTextLeft={"Display at most"}
+                labelTextRight={"of the 'top edges' of each node."}
+                tooltip={"This parameter limits the number of edges that are added to the graph for each node. The biggest edges in terms of number of events shared between each node and another one are added first."}
                 inputProps={{
                   min: 1,
                   max: CONFIG.GRAPH_MAX_NB_BEST_EDGES,
@@ -116,7 +130,9 @@ export class GraphParamBox {
               />
 
               <Slider
-                labelText={"Show only edges that have at least in common"}
+                labelTextLeft={"Show only edges of weight at least"}
+                labelTextRight={"."}
+                tooltip={"The 'weight' of an edge represents the number of events that were shared by both of the news sources connected by the edge."}
                 inputProps={{
                   min: 1,
                   max: CONFIG.GRAPH_MAX_MIN_NB_SHARED_EVENTS_EDGE,
@@ -129,7 +145,9 @@ export class GraphParamBox {
               />
 
               <Slider
-                labelText={"Tone distance threshold"}
+                labelTextLeft={"Set the tone distance threshold to"}
+                labelTextRight={"."}
+                tooltip={"This threshold is used to color the edges: if the distance between the average recorded tone of each news source is above the threshold, then the corresponding edge is red. Otherwise it is green."}
                 inputProps={{
                   min: 0.02,
                   max: CONFIG.GRAPH_MAX_NB_BEST_EDGES,
