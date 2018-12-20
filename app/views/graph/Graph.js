@@ -67,7 +67,7 @@ class Graph {
           selector: "node",
           style: {
             "background-color": "data(color)",
-            "background-opacity": 0,
+            "background-opacity": "data(opacity)",
             "label": "data(label)",
             "text-valign": "center",
             "width": "data(scale)",
@@ -275,7 +275,8 @@ class Graph {
           color: NODE_SOURCE_COLOR,
           scale: 8 * el[1].mentionnedEventsCount / maxSharedEventsCount,
           mentionnedEventsCount: el[1].mentionnedEventsCount,
-          avgTone: el[1].avgTone
+          avgTone: el[1].avgTone,
+          opacity: 0
         }
       });
     });
@@ -356,7 +357,8 @@ class Graph {
           scale: 8,
           label: node[0][0].split(".")[0],
           sharedEventsCount: node[0][1],
-          type: "source"
+          type: "source",
+          opacity: 0
         },
         position: { x: node[1], y: 50 }
       });
@@ -380,6 +382,7 @@ class Graph {
           id: eventId,
           color: NODE_EVENT_COLOR,
           scale: 2,
+          label: "",
           eventId,
           source1,
           source2,
@@ -387,7 +390,8 @@ class Graph {
           url2,
           avgTone1,
           avgTone2,
-          type: "event"
+          type: "event",
+          opacity: 1
         },
         position: { x: 100, y: pos_y[idx] },
         classes: "event"
@@ -454,7 +458,6 @@ class Graph {
       });
     }
 
-
     if (this.viewMode === VIEW_MODE_OVERVIEW) {
       this.cy.layout({
         name: "cose-bilkent",
@@ -477,6 +480,8 @@ class Graph {
     } else {
       throw new Error("Not supported");
     }
+
+    this.cy.resize();
 
     this.setColorsDynamically();
   }
