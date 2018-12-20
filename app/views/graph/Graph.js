@@ -15,6 +15,7 @@ const VIEW_MODE_OVERVIEW = 0;
 const VIEW_MODE_DETAILS = 1;
 
 const NODE_SOURCE_COLOR = "#495149";
+const NODE_HIGHLIGHT_COLOR = "#e65d3e";
 const NODE_EVENT_COLOR = "orange";
 
 const RED = "#a20417";
@@ -97,8 +98,8 @@ class Graph {
         {
           selector: "node.highlighted",
           style: {
-            "background-color": "#e65d3e",
-            "text-outline-color": "#e65d3e"
+            "background-color": NODE_HIGHLIGHT_COLOR,
+            "text-outline-color": NODE_HIGHLIGHT_COLOR
           }
         },
         {
@@ -120,11 +121,13 @@ class Graph {
       wheelSensitivity: 0.2
     });
 
+    // Responsive to window resize
     this.cy.on("resize", () => {
       this.cy.fit();
     });
 
 
+    // Upon tap on edge, change to detailed comparison view
     this.cy.on("tap", "edge", evt => {
       if (self.viewMode === VIEW_MODE_OVERVIEW) {
         const edge = evt.target;
@@ -142,6 +145,7 @@ class Graph {
       }
     });
 
+    // Upon hovering over a node, hide nodes and edges that are not neighbors
     this.cy.on("mouseover", "node", e => {
       if (self.viewMode === VIEW_MODE_OVERVIEW ||
         (self.viewMode === VIEW_MODE_DETAILS && e.target.data("type") === "event")) {
@@ -164,6 +168,7 @@ class Graph {
       }
     });
 
+    // Remove tooltips upon the following events
     this.cy.on("tap", e => {
       if (e.target === this.cy) {
         hideAllTooltips(this.cy);
@@ -257,7 +262,6 @@ class Graph {
 
     this.generalElements = Array();
 
-    // const { maxToneDist, maxSharedEventsCount } = otherInfos;
     const { maxSharedEventsCount } = otherInfos;
 
     // handling nodes
@@ -268,6 +272,7 @@ class Graph {
     nodes = nodes.slice(0, config.maxNbNodes);
 
     nodes.forEach(el => {
+      // Size of node is proportional to number of events shared with others
       this.generalElements.push({
         group: "nodes", data: {
           id: el[0],
@@ -299,6 +304,7 @@ class Graph {
           const { eventsSharedCount, meanToneDist } = edge[1];
 
           if (eventsSharedCount > this.config.minNbSharedEventEdge) {
+            // Width of edge is proportional to number of shared events
             this.generalElements.push({
               group: "edges", data: {
                 id,
@@ -317,6 +323,12 @@ class Graph {
 
   }
 
+  /**
+   * Display graph in overview mode
+   * Contains nodes connected by aggregated edges
+   *
+   * @memberOf Graph
+   */
   displayGeneralView() {
     this.viewMode = VIEW_MODE_OVERVIEW;
     if (this.graphParamBox) {
@@ -327,6 +339,8 @@ class Graph {
   }
 
   /**
+   * Display detailed comparison between two nodes/outlets
+   *
    * source1 < source2
    *
    * @param {string} source1
@@ -348,8 +362,13 @@ class Graph {
 
     let elements = Array();
 
-    // TODO: what are the 0 and 100 not clear (I have an idea but still)
-    [[source1_node, 0], [source2_node, 200]].forEach((node) => {
+    // Positions for the two outlets and the column of shared events in between
+    const source1_x = 0;
+    const source2_x = 200;
+    const events_x = 100;
+    const events_y = 50;
+
+    [[source1_node, source1_x], [source2_node, source2_x]].forEach((node) => {
       elements.push({
         group: "nodes", data: {
           color: NODE_SOURCE_COLOR,
@@ -360,13 +379,14 @@ class Graph {
           type: "source",
           opacity: 0
         },
-        position: { x: node[1], y: 50 }
+        position: { x: node[1], y: events_y }
       });
     });
 
     const edgesInfo = this.rawData.edgesData;
     const sharedEvents = edgesInfo[source1][source2].events;
 
+    // Generate series of y-values for positions of shared events
     const eventsNum = Object.keys(sharedEvents).length;
     const step = 100 / eventsNum;
     const pos_y = Array.apply(null, Array(eventsNum)).map(function (_, i) { return i * step; });
@@ -393,7 +413,7 @@ class Graph {
           type: "event",
           opacity: 1
         },
-        position: { x: 100, y: pos_y[idx] },
+        position: { x: events_x, y: pos_y[idx] },
         classes: "event"
       });
 
@@ -422,6 +442,7 @@ class Graph {
     this.cy.elements().remove();
     this.cy.add(elements);
 
+    // Create tooltip boxes
     if (this.viewMode === VIEW_MODE_OVERVIEW) {
       this.cy.nodes().forEach(node => {
         const content = `
