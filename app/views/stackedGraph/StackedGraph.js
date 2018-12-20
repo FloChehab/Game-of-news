@@ -238,7 +238,6 @@ class StackedGraph {
       .style("pointer-events", "none");
 
     const layers = this.chart.selectAll(".stackedLayer");
-    // const firstDate = d3.min(this.data.dates);
     layers
       .on("mouseover", (d) => {
         if (typeof source == "undefined") {
@@ -250,12 +249,9 @@ class StackedGraph {
         tooltipText.style("display" , "initial");
       })
       .on("mousemove", function(d) {
-        // console.log(d)
         const coordinates = d3.mouse(this);
         const verticalDate = x.invert(coordinates[0]);
         const allData = d.map( v => v.data );
-        // console.log(verticalDate)
-        // const dateIndex = nearestHourDate(verticalDate).getHours() - firstDate.getHours();
         const count = Math.round(getDataHover(verticalDate, allData, d.key));
 
         vertical
@@ -284,7 +280,8 @@ class StackedGraph {
       .on("mouseover", function() {
         const legendItem = d3.select(this);
         layers.call(highlightLayer, this.dataset.key, this.dataset.index,
-          true, legendItem, this.dataset.color);
+          typeof source == "undefined", legendItem, this.dataset.color);
+        legendItem.style("cursor", "pointer");
       })
       .on("mouseout", function() {
         const legendItem = d3.select(this);
