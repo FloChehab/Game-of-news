@@ -97,7 +97,7 @@ class StackedGraph {
 
   generateDrilldown(k) {
     d3.selectAll(".list-group-item")
-      .style("background-color", "initial");
+      .style("background-color", "white");
     const legendItem = d3.select(`#${this.getLegendElemId(k)}`);
     legendItem.style("background-color", legendItem.attr("data-color"));
 
@@ -268,7 +268,7 @@ class StackedGraph {
       .on("mouseout", (d) => {
         if (typeof source === "undefined") {
           const legendItem = d3.select(`#${this.getLegendElemId(d.key)}`);
-          layers.call(highlightLayer, -1, -1, false, legendItem, "white");
+          layers.call(highlightLayer, -1, -1, false, legendItem, "initial");
         }
         vertical.style("display" , "none");
         tooltip.style("display" , "none");
