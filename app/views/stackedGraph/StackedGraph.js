@@ -10,6 +10,20 @@ class StackedGraph {
     this.chart = {};
     this.axis = {};
 
+    //French Palette by Lea Poisson (https://flatuicolors.com/palette/fr)
+    this.colors = [
+      d3.rgb(229, 80, 57),
+      d3.rgb(246, 185, 59),
+      d3.rgb(250, 211, 144),
+      d3.rgb(248, 194, 145),
+      d3.rgb(106, 137, 204),
+      d3.rgb(130, 204, 221),
+      d3.rgb(184, 233, 148),
+      d3.rgb(120, 224, 143),
+      d3.rgb(96, 163, 188),
+      d3.rgb(74, 105, 189)
+    ];
+
     // Current data provided by the Data Manager
     this.data = {
       dates: Array(),
@@ -83,7 +97,8 @@ class StackedGraph {
     const data = stack(this.data.streamgraph);
 
     //let chroma = (k, i) => d3.interpolateYlGnBu(i / this.active.layerIDs.length)
-    let chroma = (k, i) => d3.schemeSet3[i];
+    //let chroma = (k, i) => d3.schemeSet3[i];
+    let chroma = (k, i) => this.colors[i];
 
     this.updateLegend(
       data.concat().sort((a, b) => b.index - a.index).map((d) =>
@@ -97,7 +112,7 @@ class StackedGraph {
 
   generateDrilldown(k) {
     d3.selectAll(".list-group-item")
-      .style("background-color", "initial");
+      .style("background-color", "white");
     const legendItem = d3.select(`#${this.getLegendElemId(k)}`);
     legendItem.style("background-color", legendItem.attr("data-color"));
 
@@ -238,7 +253,6 @@ class StackedGraph {
       .style("pointer-events", "none");
 
     const layers = this.chart.selectAll(".stackedLayer");
-    // const firstDate = d3.min(this.data.dates);
     layers
       .on("mouseover", (d) => {
         if (typeof source == "undefined") {
@@ -250,12 +264,9 @@ class StackedGraph {
         tooltipText.style("display" , "initial");
       })
       .on("mousemove", function(d) {
-        // console.log(d)
         const coordinates = d3.mouse(this);
         const verticalDate = x.invert(coordinates[0]);
         const allData = d.map( v => v.data );
-        // console.log(verticalDate)
-        // const dateIndex = nearestHourDate(verticalDate).getHours() - firstDate.getHours();
         const count = Math.round(getDataHover(verticalDate, allData, d.key));
 
         vertical
@@ -284,12 +295,13 @@ class StackedGraph {
       .on("mouseover", function() {
         const legendItem = d3.select(this);
         layers.call(highlightLayer, this.dataset.key, this.dataset.index,
-          true, legendItem, this.dataset.color);
+          typeof source == "undefined", legendItem, this.dataset.color);
+        legendItem.style("cursor", "pointer");
       })
       .on("mouseout", function() {
         const legendItem = d3.select(this);
         if (typeof source == "undefined" || this.dataset.key !== source) {
-          layers.call(highlightLayer, -1, -1, false, legendItem, "initial");
+          layers.call(highlightLayer, -1, -1, false, legendItem, "white");
         } else {
           layers.call(highlightLayer, -1, -1, false, legendItem, this.dataset.color);
         }
