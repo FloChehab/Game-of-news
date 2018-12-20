@@ -2,7 +2,7 @@ import {
   nearestHourDate,
   numberOfHoursBetween,
   addHourToDate,
-  roundDateTimeToDay
+  roundDateTimeToDayUTC
 } from "../utils/dateManipulations";
 
 
@@ -44,7 +44,7 @@ test("Round datetime to date", () => {
   const d1 = new Date(2018, 10, 2, 12, 15),
     d1Target = new Date(Date.UTC(2018, 10, 2, 0, 0, 0, 0, 0));
 
-  expectDateEquals(roundDateTimeToDay(d1), d1Target);
+  expectDateEquals(roundDateTimeToDayUTC(d1), d1Target);
 });
 
 
