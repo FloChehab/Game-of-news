@@ -112,7 +112,7 @@ class StackedGraph {
   }
 
   generateStreamgraph() {
-    d3.select("#linkToGlobalView a")
+    d3.select(this.context).select("#linkToGlobalView a")
       .style("visibility", "hidden")
       .on("click", null);
 
@@ -137,12 +137,12 @@ class StackedGraph {
   }
 
   generateDrilldown(k) {
-    d3.selectAll(".list-group-item")
+    d3.select(this.context).selectAll(".list-group-item")
       .style("background-color", "white");
     const legendItem = d3.select(`#${this.getLegendElemId(k)}`);
     legendItem.style("background-color", legendItem.attr("data-color"));
 
-    d3.select("#linkToGlobalView a")
+    d3.select(this.context).select("#linkToGlobalView a")
       .style("visibility", "visible")
       .on("click", () => {
         d3.event.preventDefault();
@@ -165,11 +165,11 @@ class StackedGraph {
   }
 
   updateViz(data, chroma, source) {
-    // let self = this;
+    let self = this;
 
-    d3.select("#stackedVertical").remove();
-    d3.select("#stackedTooltip").remove();
-    d3.select("#stackedTooltipText").remove();
+    d3.select(self.context).select("#stackedVertical").remove();
+    d3.select(self.context).select("#stackedTooltip").remove();
+    d3.select(self.context).select("#stackedTooltipText").remove();
 
     const x = d3.scaleTime()
       .domain([d3.min(this.data.dates), d3.max(this.data.dates)])
