@@ -37,7 +37,7 @@ class TimeWindowSelector {
 
     // Link the date picker
     const datePicker = document.getElementById("dateTimeWindowSelector");
-    datePicker.onchange = () => this.updateHighledDateAndRedraw(strIsoToDate(datePicker.value));
+    datePicker.onchange = () => this.updateHighlightedDateAndRedraw(strIsoToDate(datePicker.value));
 
     this.lastSelection = false;
     this.lastSelectionBrushing = false;
@@ -80,7 +80,7 @@ class TimeWindowSelector {
 
   /**
    * Function to update the scale given a new scale,
-   * The scale is also storred
+   * The scale is also stored
    *
    * @param {Array[Date]} newDomain
    * @memberof TimeWindowSelector
@@ -130,7 +130,7 @@ class TimeWindowSelector {
     }
 
     /**
-     * Function to tell wheter the thow limits of the rectangle are moved simultaneaously
+     * Function to tell whether the two limits of the rectangle are moved simultaneously
      *
      * @returns {boolean}
      */
@@ -185,8 +185,8 @@ class TimeWindowSelector {
       let roundedSelectedDates = selectedDates.map((date) => nearestHourDate(date));
 
       if (self.lastSelection !== false) {
-        // If the delay between the two han't change, assume the two limits
-        // of the rectange have been moved simultaneaously
+        // If the delay between the two hasn't change, assume the two limits
+        // of the rectangle have been moved simultaneously
         if (isRectMoving()) {
           const prevD1 = self.lastSelection[0],
             currD1 = roundedSelectedDates[0];
@@ -218,7 +218,7 @@ class TimeWindowSelector {
     });
   }
 
-  updateHighledDateAndRedraw(date) {
+  updateHighlightedDateAndRedraw(date) {
     this.highlightedDate = date;
 
     this.updateAxis(this.getAvailableTimeWindow());
@@ -236,7 +236,7 @@ class TimeWindowSelector {
       .call(this.xAxisLabel);
 
     if (this.brushGroup !== false) {
-      // the brush has been used once, we shoudl update its position too.
+      // the brush has been used once, we should update its position too.
       d3.select(this.brushGroup)
         .transition()
         .duration(dur)

@@ -78,17 +78,27 @@ export function strIsoToDate(str) {
 }
 
 /**
- * Function that returns a new date whith all attributes not related to date set to zero.
+ * Function that returns a new date with all attributes not related to date set to zero.
  * Date will be centered on UTC time.
  *
  * @export
  * @param {Date} date
  * @returns
  */
-export function roundDateTimeToDay(date) {
+export function roundDateTimeToDayUTC(date) {
   return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 0, 0, 0, 0));
 }
 
+/**
+ * Function that returns a new date with all attributes not related to date set to zero.
+ *
+ * @export
+ * @param {Date} date
+ * @returns
+ */
+export function roundDateTimeToDay(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
+}
 
 const nbMsInHour = 60 * 60 * 1000;
 /**
