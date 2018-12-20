@@ -42,23 +42,22 @@ class StackedGraph {
     // Need to create some html elements to support the plot
     let create = (type) => document.createElement(type);
     let legend = create("div");
-    legend.setAttribute("id", "dashboardStackedGraphLegend");
+    legend.setAttribute("class", "StackedGraphLegend");
 
     let sources = create("ul");
-    sources.setAttribute("class", "list-group");
-    sources.setAttribute("id", "dashboardStackedGraphSources");
+    sources.setAttribute("class", "list-group StackedGraphSources");
 
     let linkBackDiv = create("div");
     linkBackDiv.setAttribute("class", "linkToGlobalView");
-    linkBackDiv.setAttribute("id", "linkToGlobalView");
 
     let linkBack = create("a");
     linkBack.setAttribute("href", "#");
     linkBack.setAttribute("class", "btn btn-secondary");
     linkBack.setAttribute("style", "text-decoration: none; visibility: hidden");
+    linkBack.innerText = "Back to global view";
 
     let plotDiv = create("div");
-    plotDiv.setAttribute("id", "dashboardStackedGraphPlot");
+    plotDiv.setAttribute("class", "StackedGraphPlot");
 
     this.context.appendChild(legend);
     this.context.appendChild(plotDiv);
@@ -67,17 +66,17 @@ class StackedGraph {
     linkBackDiv.appendChild(linkBack);
     // End of html element creation
 
-    const svg = d3.select("#dashboardStackedGraphPlot")
+    const svg = d3.select(plotDiv)
       .append("svg")
         .attr("preserveAspectRatio", "xMinYMin meet")
         .attr("viewBox", "0, 0, 1000, 500");
-    this.legend = d3.select("#dashboardStackedGraphSources");
+    this.legend = d3.select(sources);
 
     this.chart = svg.append("g")
-      .attr("id", "stackedChart");
+      .attr("class", "stackedChart");
 
     this.axis = svg.append("g")
-      .attr("id", "stackedAxis")
+      .attr("class", "stackedAxis")
       .attr("transform", "translate(0, 450)");
 
     dataManagerInstance.subscribe(this);
@@ -112,7 +111,7 @@ class StackedGraph {
   }
 
   generateStreamgraph() {
-    d3.select(this.context).select("#linkToGlobalView a")
+    d3.select(this.context).select(".linkToGlobalView a")
       .style("visibility", "hidden")
       .on("click", null);
 
@@ -142,7 +141,7 @@ class StackedGraph {
     const legendItem = d3.select(`#${this.getLegendElemId(k)}`);
     legendItem.style("background-color", legendItem.attr("data-color"));
 
-    d3.select(this.context).select("#linkToGlobalView a")
+    d3.select(this.context).select(".linkToGlobalView a")
       .style("visibility", "visible")
       .on("click", () => {
         d3.event.preventDefault();
@@ -167,9 +166,9 @@ class StackedGraph {
   updateViz(data, chroma, source) {
     let self = this;
 
-    d3.select(self.context).select("#stackedVertical").remove();
-    d3.select(self.context).select("#stackedTooltip").remove();
-    d3.select(self.context).select("#stackedTooltipText").remove();
+    d3.select(self.context).select(".stackedVertical").remove();
+    d3.select(self.context).select(".stackedTooltip").remove();
+    d3.select(self.context).select(".stackedTooltipText").remove();
 
     const x = d3.scaleTime()
       .domain([d3.min(this.data.dates), d3.max(this.data.dates)])
@@ -244,7 +243,7 @@ class StackedGraph {
     }
 
     const vertical = this.chart.append("line")
-      .attr("id", "stackedVertical")
+      .attr("class", "stackedVertical")
       .attr("x1", 0)
       .attr("y1", 0)
       .attr("x2", 0)
@@ -257,7 +256,7 @@ class StackedGraph {
 
     const tooltipG = this.chart.append("g");
     const tooltip = tooltipG.append("rect")
-      .attr("id", "stackedTooltip")
+      .attr("class", "stackedTooltip")
       .attr("x", 50)
       .attr("y", 50)
       .attr("width", 50)
@@ -272,7 +271,7 @@ class StackedGraph {
 
 
     const tooltipText = tooltipG.append("text")
-      .attr("id", "stackedTooltipText")
+      .attr("class", "stackedTooltipText")
       .attr("x", 75)
       .attr("y", 70)
       .attr("text-anchor", "middle")
@@ -284,7 +283,7 @@ class StackedGraph {
     layers
       .on("mouseover", (d) => {
         if (typeof source == "undefined") {
-          const legendItem = d3.select(`#${this.getLegendElemId(d.key)}`);
+          const legendItem = d3.select(self.context).select(`#${this.getLegendElemId(d.key)}`);
           layers.call(highlightLayer, d.key, d.index, true, legendItem, legendItem.attr("data-color"));
         }
         vertical.style("display" , "initial");
@@ -310,7 +309,7 @@ class StackedGraph {
       })
       .on("mouseout", (d) => {
         if (typeof source === "undefined") {
-          const legendItem = d3.select(`#${this.getLegendElemId(d.key)}`);
+          const legendItem = d3.select(self.context).select(`#${this.getLegendElemId(d.key)}`);
           layers.call(highlightLayer, -1, -1, false, legendItem, "white");
         }
         vertical.style("display" , "none");

@@ -1,14 +1,20 @@
-#dashboardStackedGraphContainer {
+.StackedGraphContainer {
+  svg {
+    display: inline-block;
+    overflow: visible;
+    width: 100%;
+  }
+
   align-items: center;
   display: flex;
   justify-content: space-around;
   flex-wrap: wrap;
 
-  #dashboardStackedGraphLegend{
+  .StackedGraphLegend{
     flex:1;
     min-width: 150px;
 
-    #linkToGlobalView {
+    .linkToGlobalView {
       text-align: center;
     }
 
@@ -19,11 +25,11 @@
     }
   }
 
-  #dashboardStackedGraphSources {
+  .StackedGraphSources {
     margin-bottom: 0.5em;
   }
 
-  #dashboardStackedGraphPlot{
+  .StackedGraphPlot{
     flex:5;
     min-width: 80%;
     padding: 0 1.5%;
