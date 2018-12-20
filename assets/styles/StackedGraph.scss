@@ -1,10 +1,4 @@
 #dashboardStackedGraphContainer {
-  svg {
-    display: inline-block;
-    overflow: visible;
-    width: 100%;
-  }
-
   align-items: center;
   display: flex;
   justify-content: space-around;
@@ -31,7 +25,13 @@
 
   #dashboardStackedGraphPlot{
     flex:5;
-    min-width: 650px;
+    min-width: 85%;
     padding: 0 1.5%;
+
+    svg {
+      display: inline-block;
+      overflow: visible;
+      width: 100%;
+    }
   }
 }

@@ -268,7 +268,7 @@ class StackedGraph {
       .on("mouseout", (d) => {
         if (typeof source === "undefined") {
           const legendItem = d3.select(`#${this.getLegendElemId(d.key)}`);
-          layers.call(highlightLayer, -1, -1, false, legendItem, "initial");
+          layers.call(highlightLayer, -1, -1, false, legendItem, "white");
         }
         vertical.style("display" , "none");
         tooltip.style("display" , "none");
@@ -286,7 +286,7 @@ class StackedGraph {
       .on("mouseout", function() {
         const legendItem = d3.select(this);
         if (typeof source == "undefined" || this.dataset.key !== source) {
-          layers.call(highlightLayer, -1, -1, false, legendItem, "initial");
+          layers.call(highlightLayer, -1, -1, false, legendItem, "white");
         } else {
           layers.call(highlightLayer, -1, -1, false, legendItem, this.dataset.color);
         }
