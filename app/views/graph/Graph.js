@@ -52,7 +52,7 @@ class Graph {
     ReactDOM.render(
       <button
         type="button"
-        className="btn btn-primary btn-graph-zoom-out"
+        className="btn btn-secondary btn-graph-zoom-out"
         onClick={() => self.processAndDisplay()}
       >
         Reset state
