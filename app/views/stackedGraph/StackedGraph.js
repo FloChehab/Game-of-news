@@ -39,12 +39,38 @@ class StackedGraph {
   }
 
   init() {
-    // Set up svg
-    const svg = d3.select(this.context)
+    // Need to create some html elements to support the plot
+    let create = (type) => document.createElement(type);
+    let legend = create("div");
+    legend.setAttribute("id", "dashboardStackedGraphLegend");
+
+    let sources = create("ul");
+    sources.setAttribute("class", "list-group");
+    sources.setAttribute("id", "dashboardStackedGraphSources");
+
+    let linkBackDiv = create("div");
+    linkBackDiv.setAttribute("class", "linkToGlobalView");
+    linkBackDiv.setAttribute("id", "linkToGlobalView");
+
+    let linkBack = create("a");
+    linkBack.setAttribute("href", "#");
+    linkBack.setAttribute("class", "btn btn-secondary");
+    linkBack.setAttribute("style", "text-decoration: none; visibility: hidden");
+
+    let plotDiv = create("div");
+    plotDiv.setAttribute("id", "dashboardStackedGraphPlot");
+
+    this.context.appendChild(legend);
+    this.context.appendChild(plotDiv);
+    legend.appendChild(sources);
+    legend.appendChild(linkBackDiv);
+    linkBackDiv.appendChild(linkBack);
+    // End of html element creation
+
+    const svg = d3.select("#dashboardStackedGraphPlot")
       .append("svg")
         .attr("preserveAspectRatio", "xMinYMin meet")
         .attr("viewBox", "0, 0, 1000, 500");
-
     this.legend = d3.select("#dashboardStackedGraphSources");
 
     this.chart = svg.append("g")
@@ -139,6 +165,8 @@ class StackedGraph {
   }
 
   updateViz(data, chroma, source) {
+    // let self = this;
+
     d3.select("#stackedVertical").remove();
     d3.select("#stackedTooltip").remove();
     d3.select("#stackedTooltipText").remove();
