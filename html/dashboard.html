@@ -1,0 +1,75 @@
+<div id='dashboardViewsSelect' class="d-flex justify-content-center vert-margin">
+</div>
+
+<div id='dashboard' class="fluid-width-container">
+
+  <div id="dashboardGraphContainer">
+    <div id="dashboardGraphParams"></div>
+    <div id="dashboardGraph" class="view"></div>
+  </div>
+
+  <div id="dashboardStackedGraphContainer" class="container-fluid view">
+    <div id="dashboardStackedGraphLegend">
+      <ul id="dashboardStackedGraphSources" class="list-group">
+      </ul>
+      <div id="linkToGlobalView">
+        <a href="#" class="btn btn-secondary" style="text-decoration: none; visibility: hidden">
+          Back to global view
+        </a>
+      </div>
+    </div>
+    <div id="dashboardStackedGraphPlot"></div>
+  </div>
+
+  <div class="c-section__footer p-2 fluid-width-container">
+
+    <div class="form-group">
+      <label for="dashboardSelectDataset">You can select one of the available datasets:</label>
+      <div class="flexContainer">
+        <select id="dashboardSelectDataset" class="form-control">
+        </select>
+        <button id="buttonDownloadDataset" class="btn btn-info">
+          Export dataset
+        </button>
+      </div>
+      <div id="restoreDatasetDiv">
+        <label>
+          You can also restore a previously exported dataset:
+        </label>
+        <label class="btn btn-info btn-file" style="margin-bottom: 0;">
+          Browse <input type="file" id="inputLoadDataset" style="display: none;">
+        </label>
+      </div>
+    </div>
+
+    <div id='timeWindowSelectorWrapper'>
+      <div class="API-GDELT-REQUIRED" data-required="true" style="display: none;">
+        <div class="can-make-request" data-required="false" style="text-align: center;">
+          <label for='timeWindowSelector'>
+            Finally, you can explore a custom dataset on demand (will take few seconds de generate):
+          </label>
+          <div id='timeWindowSelector' class='timeWindowSelectorAvailable'></div>
+          <div class="datePicker">
+            <label for="dateTimeWindowSelector">Center window on:</label>
+            <input id='dateTimeWindowSelector' type='date' class="form-control" required pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" />
+          </div>
+        </div>
+
+        <div class="can-make-request" data-required="true" style="display: none;">
+          <p>
+            A dataset is being built just for you. This task can take up to 30 seconds. Please be patient.
+            In the meantime you can play with views, when the data will be ready it will be automatically set.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="alert alert-info API-GDELT-REQUIRED" role="alert" data-required="false">
+        Some more advanced functionalities regarding live querying the GDELT database
+        have been disabled since the server that is currently used doesn't support this feature.
+        You can still explore with the provided datasets.
+      </div>
+    </div>
+  </div>
+
+</div>
