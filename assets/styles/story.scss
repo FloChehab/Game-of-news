@@ -12,6 +12,26 @@
   height: 640px;
 }
 
+.fluid-width-container-story-plot {
+  @media screen and (min-width: 1200px) {
+    width: 85%;
+    max-width: 1920px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+
+.fluid-width-container-story {
+  @media screen and (min-width: 1200px) {
+    width: 70%;
+    max-width: 1920px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+
 #storyGraphContainer {
   margin-bottom: 1em;
 }

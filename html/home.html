@@ -1,8 +1,27 @@
 <h1 class="display-3">Game of News</h1>
 <p class="lead mb-2">Explore the news in a different way</p>
-<!-- <a class="c-section__link mb-4" href="https://github.com/hsnaydd/moveTo">Documentation on GitHub</a> -->
-<div id='app'></div>
-<div class="d-flex justify-content-center" style="display: none;" class="API-REQUIRED">
-  <a href="#story-block" class="btn btn-lg c-section__btn js-trigger">Go to story</a>
-  <a href="#dashboard-block" class="btn btn-lg secondary c-section__btn js-trigger">Go to dashboard</a>
+
+<div id="introBlock" class="alert alert-primary fluid-width-container-story" role="alert">
+    <p><strong>Game of news</strong> is a data visualization platform that aims at exploring the latent ties between news outlets.</p>
+
+    <p>It’s based upon the <a href="https://www.gdeltproject.org/" target="_blank">GDELT</a> (Global Database of Events, Language, and Tone) project and in particular the events and mentions information it gathers. In fact, GDELT is constantly monitoring thousands and thousands of news related website to keep track of what events are mentioned in what articles. It also provides the estimated tone of the article.</p>
+
+    <p>We have aggregated all that information and summarized it in two different views:</p>
+
+    <ul>
+      <li>A two-level graph that relates the news outlets based on the news events they share in common.</li>
+      <li>A two-level stacked area chart that shows how these relationships evolve over time.</li>
+    </ul>
+
+    <p>If it is the first time you come by here, we highly recommend you go through the story first as it will explains the few things to know about the views present in the dashboard.</p>
+
+    <p><em>When the first dataset will be loaded, you will be able to move forward...</em></p>
+
+</div>
+
+<div style="display: none;" class="FIRST-DATASET-REQUIRED">
+  <div class="d-flex justify-content-center">
+    <a href="#story-block" class="btn btn-lg c-section__btn js-trigger">Go to story</a>
+    <a href="#dashboard-block" class="btn btn-lg secondary c-section__btn js-trigger">Go to dashboard</a>
+  </div>
 </div>
