@@ -25,6 +25,7 @@ class Graph {
   constructor(mainContext, paramContext) {
 
     this.mainContext = mainContext;
+    this.backToGlobalViewBtnId = `${this.mainContext.id}${Math.random()}`; // Small hack to generate a random id
     this.paramContext = paramContext;
     this.rawData = Object();
     this.generalElements = Array();
@@ -50,14 +51,27 @@ class Graph {
     const divZoomBack = document.createElement("div");
     this.mainContext.appendChild(divZoomBack);
 
+
+
     ReactDOM.render(
-      <button
-        type="button"
-        className="btn btn-secondary btn-graph-zoom-out"
-        onClick={() => self.processAndDisplay()}
-      >
-        Reset state
-      </button>
+      <div className="btn-graph-zoom-out">
+        <button
+          type="button"
+          className="btn btn-secondary"
+          onClick={() => self.processAndDisplay(self.config, self.viewMode)}
+        >
+          Reset state
+        </button>
+        <button
+          id = {self.backToGlobalViewBtnId}
+          type="button"
+          className="btn btn-secondary back-global-view"
+          style={{ display: "none" }}
+          onClick={() => self.processAndDisplay(self.config, VIEW_MODE_OVERVIEW)}
+        >
+          Back to global view
+        </button>
+      </div>
       , divZoomBack);
 
 
@@ -250,9 +264,13 @@ class Graph {
     }
   }
 
-  processAndDisplay(config = this.config) {
+  processAndDisplay(config = this.config, display = VIEW_MODE_OVERVIEW) {
     this.processData(config);
-    this.displayGeneralView();
+    if (display === VIEW_MODE_OVERVIEW) {
+      this.displayGeneralView();
+    } else {
+      this.displayPreciseView(...this.preciseViewElements);
+    }
   }
 
   processData(config) {
@@ -331,6 +349,8 @@ class Graph {
    */
   displayGeneralView() {
     this.viewMode = VIEW_MODE_OVERVIEW;
+    document.getElementById(this.backToGlobalViewBtnId)
+      .setAttribute("style", "display: none;");
     if (this.graphParamBox) {
       this.graphParamBox.setWeAreInSecondaryView(false);
     }
@@ -349,6 +369,9 @@ class Graph {
    */
   displayPreciseView(source1, source2) {
     this.viewMode = VIEW_MODE_DETAILS;
+    document.getElementById(this.backToGlobalViewBtnId)
+      .setAttribute("style", "");
+    this.preciseViewElements = [source1, source2]; // store for allowing reset
 
     if (this.graphParamBox) {
       this.graphParamBox.setWeAreInSecondaryView(true);
