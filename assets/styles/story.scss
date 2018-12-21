@@ -5,9 +5,44 @@
 }
 
 #intro {
-  margin-bottom: 320px;
+  margin-bottom: 5rem;
 }
 
 #outro {
   height: 640px;
+}
+
+.fluid-width-container-story-plot {
+  @media screen and (min-width: 1200px) {
+    width: 85%;
+    max-width: 1920px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+.fluid-width-container-story,
+.story-text {
+  @media screen and (min-width: 1200px) {
+    width: 70%;
+    max-width: 1920px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+.story-text {
+  // background-color: white;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  text-align: justify;
+}
+
+#storyGraphContainer {
+  margin-bottom: 1em;
+}
+
+#storyGraph {
+  height: 70vh;
 }

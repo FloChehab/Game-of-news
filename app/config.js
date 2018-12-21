@@ -8,7 +8,7 @@ let CONFIG = {
   // For simplicity we set the max querrying time to 24 houts earlier
   LAST_AVAILABLE_GDELT_DATETIME: twoDaysBefore,
   MAX_NB_HOURS_GBQ_QUERY: 24,
-  PRE_FETCHED_DATASETS: ["ex_GBQ_res.json"],
+  PRE_FETCHED_DATASETS: ["gilet_jaune_10th_December_->_11th_December.json"],
   END_POINT_LIVE_GDELT_DATA: "http://0.0.0.0:8000/",
   //"END_POINT_LIVE_GDELT_DATA": LIVE_API,
   GRAPH_MAX_NB_NODES: 40,

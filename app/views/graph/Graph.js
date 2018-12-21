@@ -22,7 +22,7 @@ const RED = "#a20417";
 const GREEN = "#007144";
 
 class Graph {
-  constructor(mainContext, paramContext) {
+  constructor(mainContext, paramContext = undefined, config = undefined) {
 
     this.mainContext = mainContext;
     this.backToGlobalViewBtnId = `${this.mainContext.id}${Math.random()}`; // Small hack to generate a random id
@@ -32,18 +32,24 @@ class Graph {
     this.viewMode = undefined;
 
     // Initial parameters for the graph
-    this.config = {
-      maxNbNodes: 13,
-      bestNEdges: 3,
-      minNbSharedEventEdge: 1,
-      toneDistThreshold: 1,
-      posNegThreshold: 0
-    };
+    if (typeof config === "undefined") {
+      this.config = {
+        maxNbNodes: 13,
+        bestNEdges: 3,
+        minNbSharedEventEdge: 1,
+        toneDistThreshold: 1,
+        posNegThreshold: 0
+      };
+    } else {
+      this.config = config;
+    }
   }
 
-  init() {
+  init(subscribe = true) {
     const self = this;
-    dataManagerInstance.subscribe(this);
+    if (subscribe) {
+      dataManagerInstance.subscribe(this);
+    }
     if (typeof this.paramContext !== "undefined") {
       this.graphParamBox = new GraphParamBox(this, this.paramContext, this.config);
     }
@@ -63,7 +69,7 @@ class Graph {
           Reset state
         </button>
         <button
-          id = {self.backToGlobalViewBtnId}
+          id={self.backToGlobalViewBtnId}
           type="button"
           className="btn btn-secondary back-global-view"
           style={{ display: "none" }}
@@ -202,6 +208,7 @@ class Graph {
   updateData(data) {
     this.rawData = data.graph;
     this.processAndDisplay();
+    this.cy.fit();
   }
 
   /**

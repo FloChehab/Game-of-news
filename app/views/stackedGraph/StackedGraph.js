@@ -41,7 +41,7 @@ class StackedGraph {
     };
   }
 
-  init() {
+  init(subscribe = true) {
     // Need to create some html elements to support the plot
     let create = (type) => document.createElement(type);
     let legend = create("div");
@@ -82,7 +82,9 @@ class StackedGraph {
       .attr("class", "stackedAxis")
       .attr("transform", "translate(0, 450)");
 
-    dataManagerInstance.subscribe(this);
+    if (subscribe){
+      dataManagerInstance.subscribe(this);
+    }
   }
 
   updateData(data) {
