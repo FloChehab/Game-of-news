@@ -26,7 +26,8 @@
     "moveto": "^1.7.4",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
-    "tippy.js": "^2.6.0"
+    "tippy.js": "^2.6.0",
+    "webfontloader": "^1.6.28"
   },
   "devDependencies": {
     "@babel/core": "7.1.2",

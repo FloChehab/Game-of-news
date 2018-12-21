@@ -479,6 +479,7 @@ class Graph {
       });
     }
 
+
     if (this.viewMode === VIEW_MODE_OVERVIEW) {
       this.cy.layout({
         name: "cose-bilkent",
@@ -494,15 +495,16 @@ class Graph {
         initialEnergyOnIncremental: 0.5,
         tile: true
       }).run();
+      this.cy.fit();
     } else if (this.viewMode === VIEW_MODE_DETAILS) {
       this.cy.layout({
         name: "preset"
       }).run();
+
+      this.cy.resize();
     } else {
       throw new Error("Not supported");
     }
-
-    this.cy.resize();
 
     this.setColorsDynamically();
   }
