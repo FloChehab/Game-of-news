@@ -4,6 +4,7 @@ import { fetchServerStatus } from "./fetchData/fetchData";
 import dataManagerInstance from "./fetchData/DataManager";
 import Dashboard from "./views/dashboard/Dashboard";
 import Story from "./Story";
+import CONFIG from "./config";
 import "../assets/styles/index.scss";
 import "bootstrap/dist/css/bootstrap.min.css";
 import WebFont from "webfontloader";
@@ -55,16 +56,27 @@ class App {
 
     fetchServerStatus()
       .then(() => {
-        dataManagerInstance.preFetchAllDatasets();
-
-        for (let el of document.getElementsByClassName("API-REQUIRED")) {
-          el.setAttribute("style", ""); // remove the display None when everything is ready
+        function unHide(cls) {
+          for (let el of document.getElementsByClassName(cls)) {
+            el.setAttribute("style", ""); // remove the display None when everything is ready
+          }
         }
-        p.remove();
+
         const story = new Story();
-        story.init();
-        const dashboard = new Dashboard();
-        dashboard.init();
+        dataManagerInstance.preFetchDataset(
+          CONFIG.PRE_FETCHED_DATASETS[0],
+          (data) => {
+            unHide("FIRST-DATASET-REQUIRED");
+            story.init(data);
+            dataManagerInstance.preFetchAllDatasets();
+            const dashboard = new Dashboard();
+            dashboard.init();
+          }
+        );
+
+        unHide("API-REQUIRED");
+        p.remove();
+
       })
       .catch(() => {
         p.innerText = "ERROR while starting the server API, please reload the page or contact admin";
