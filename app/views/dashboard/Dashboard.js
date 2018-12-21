@@ -116,7 +116,7 @@ class Dashboard {
     ).init();
 
     //Add random streamgraph handleResize
-    new StackedGraph(document.getElementById("dashboardStackedGraphPlot")).init();
+    new StackedGraph(document.getElementById("dashboardStackedGraphContainer")).init();
 
     // Force init with first dataset
     dataManagerInstance.getDatasetAndUpdateViews(CONFIG.PRE_FETCHED_DATASETS[0]);
