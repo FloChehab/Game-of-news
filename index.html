@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width">
+  <link href="https://fonts.googleapis.com/css?family=Cantarell" rel="stylesheet">
+  <title>Game of News</title>
+</head>
+
+<body>
+  <div id="home-block" class="c-section c-section--primary d-flex flex-column justify-content-center align-items-center">
+    <h1 class="display-3">Game of News</h1>
+<p class="lead mb-2">Explore the news in a different way</p>
+
+<div id="introBlock" class="alert alert-primary fluid-width-container-story" role="alert">
+    <h3 class="subtitle">A data visualization platform that aims at exploring the latent ties between news outlets.</h3>
+    <br>
+
+    <p>It’s based upon the <a href="https://www.gdeltproject.org/" target="_blank">GDELT</a> (Global Database of Events, Language, and Tone) project and in particular the events and mentions information it gathers. In fact, GDELT is constantly monitoring thousands and thousands of news related website to keep track of what events are mentioned in what articles. It also provides the estimated tone of the article.</p>
+
+    <p>We have aggregated all that information and summarized it in two different views:</p>
+
+    <ul>
+      <li>A two-level graph that relates the news outlets based on the news events they share in common.</li>
+      <li>A two-level stacked area chart that shows how these relationships evolve over time.</li>
+    </ul>
+
+    <p>If it is the first time you come by here, we highly recommend you go through the story first as it will explains the few things to know about the views present in the dashboard.</p>
+
+    <p><em>When the first dataset will be loaded, you will be able to move forward...</em></p>
+
+    <br>
+    <div style="display: none;" class="FIRST-DATASET-REQUIRED">
+      <div class="d-flex justify-content-center">
+        <a href="#story-block" class="btn btn-lg c-section__btn js-trigger">Go to story</a>
+        <a href="#dashboard-block" class="btn btn-lg secondary c-section__btn js-trigger">Go to dashboard</a>
+      </div>
+    </div>
+</div>
+
+
+  </div>
+
+  <div id='app'></div>
+
+  <div id="content" class="FIRST-DATASET-REQUIRED" style="display: none;">
+    <!-- Story block -->
+    <div id="story-block" class="c-section c-section--secondary">
+      <section id='intro'>
+  <h1>EXPLORING</h1>
+  <p class='intro__dek'>
+    Start scrolling and follow a guided tour
+  </p>
+</section>
+
+<section>
+  <div class="story-text">
+    <p>As an introduction to this awesome data visualization tool, we are going to explore a restricted dataset of news mentions. We chose to focus on the recent Gilet Jaune protests in France, in particular the related articles that span between Monday 10th and Tuesday 11th of December 2018, at the time when the French President Emmanuel Macron announced policy changes towards the end of Monday after hours of non-stopping leaks and rumors about what changes would be announced.</p>
+
+    <p>Let’s first explore this data through a graph of the 13 most prolific news outlets. By ‘prolific’ we mean the news outlets that have shared the biggest number of different events in the scope of our topic. This enables to focus on the biggest players and prevent a too noisy analysis since GDELT is not perfect and is subject to inconsistencies.</p>
+
+    <p>Each news outlets on the graph is connected (at least) to the 4 nodes with whom it shared the highest number of distinct events. This enables to visualize a robust summary of how news outlets can be associated. What we can see is that there are two clear clusters of news outlets: one composed only of French news outlets and one composed mostly of foreign news outlets; the French newspaper ‘La dépèche’ acts here as a bridge between the two clusters. The color of the edges characterizes the average tone distance of each article of the two news sources (nodes) that talk about common event. We see here that the tone inside the French cluster is highly similar while in the second cluster they seem to disagree on basically everything. Therefore, non-French news sources seem to be more partisan regarding what was going.
+      You can also click on the nodes to get access to other metrics.</p>
+  </div>
+
+  <div class="fluid-width-container-story-plot">
+    <div id="storyGraphContainer">
+      <div id="storyGraph" class="view"></div>
+    </div>
+  </div>
+
+  <div class="story-text">
+    <p>To dive in the second level of the graph, you should click on an edge. In this level, the central nodes represent all the events both of the news outlets have spoken about. The color applied on the edges tells if the tone of the articles mentioning that event is rather negative or positive. That information from each of the two news outlets is summarized on the ‘event’ node color: if they agreed on the tone then the node takes the matching color. If they disagreed, then the node takes a grey color.
+    By clicking on an ‘event’ you will get more information about, including 1 corresponding news article from each source.
+    Be aware that this view clearly outlines some inconsistencies on how GDELT may map articles to events.</p>
+  </div>
+</section>
+
+<section>
+  <div class="story-text">
+    <p>Interested in how all this evolves over time? Check out the streamgraph view below! There you can see, for each source, with how many other sources it has shared a common event during a specific time interval. For example, look at ziarelive.ro (green color). At around 10am the first day, the green area becomes quite larger. What does this mean? It means that around that midday, a large number of sources shared some event that ziarelive.ro also shared - it also means that, at that point of the day, its position in the graph was particularly strong. How many sources? Move your mouse over that area and you will see a tooltip with the number.</p>
+  </div>
+
+  <div class="fluid-width-container-story-plot">
+      <div id="storyStackedGraphContainer" class="container-fluid view StackedGraphContainer"></div>
+  </div>
+
+  <div class="story-text">
+    <p>What info can we get from that visualization? We can see, for instance, that the outlets are quite dormant during the night (12am to 6am), compared to during the day.</p>
+
+    <p>NB: be aware that the data is displayed according to your time zone.</p>
+
+    <p>This happens both days. However, each source peaks at different periods each day. See, for example, how ziarelive.ro is stronger around midday, while globo.com is stronger during the evening. This might hint at the time zone difference, since globo.com is in Brazil! Notice how these peaks are not the same for all sources we can see here. For example, when globo.com is peaking during the evening, it shares events with a lot of sources that do not appear here.</p>
+
+    <p>If you click on an outlet, you can see how many of these sources agreed with that source, and how many disagreed. Check out, for example, how many outlets seemed to agree with Huffington Post around 6pm. And, sometimes, outlets agree on an event and disagree on another - this is when the one view mirrors the other, like with elpais.com!</p>
+  </div>
+
+</section>
+
+    </div>
+
+    <div id="dashboard-block" class="c-section c-section--secondary">
+      <div class="d-flex justify-content-center vert-margin">
+        <a href="#story-block" class="btn btn-lg c-section__btn js-trigger">Go to story</a>
+        <a href="#home-block" class="btn btn-lg c-section__btn js-trigger">Go to home</a>
+      </div>
+      <div>
+        <h1 id="dashboardIntro">DASHBOARD</h1>
+      </div>
+      <div id='dashboardViewsSelect' class="d-flex justify-content-center vert-margin">
+</div>
+
+<div id='dashboard' class="fluid-width-container">
+
+  <div id="dashboardGraphContainer">
+    <div id="dashboardGraphParams"></div>
+    <div id="dashboardGraph" class="view"></div>
+  </div>
+
+  <div id="dashboardStackedGraphContainer" class="container-fluid view StackedGraphContainer"></div>
+
+  <div class="c-section__footer p-2 fluid-width-container">
+
+    <div class="form-group">
+      <label for="dashboardSelectDataset">You can select one of the available datasets:</label>
+      <div class="flexContainer">
+        <select id="dashboardSelectDataset" class="form-control">
+        </select>
+        <button id="buttonDownloadDataset" class="btn btn-info">
+          Export dataset
+        </button>
+      </div>
+      <div id="restoreDatasetDiv">
+        <label>
+          You can also restore a previously exported dataset:
+        </label>
+        <label class="btn btn-info btn-file" style="margin-bottom: 0;">
+          Browse <input type="file" id="inputLoadDataset" style="display: none;">
+        </label>
+      </div>
+    </div>
+
+    <div id='timeWindowSelectorWrapper'>
+      <div class="API-GDELT-REQUIRED" data-required="true" style="display: none;">
+        <div class="can-make-request" data-required="false" style="text-align: center;">
+          <label for='timeWindowSelector'>
+            Finally, you can explore a custom dataset on demand (will take few seconds de generate):
+          </label>
+          <div id='timeWindowSelector' class='timeWindowSelectorAvailable'></div>
+          <div class="datePicker">
+            <label for="dateTimeWindowSelector">Center window on:</label>
+            <input id='dateTimeWindowSelector' type='date' class="form-control" required pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" />
+          </div>
+        </div>
+
+        <div class="can-make-request" data-required="true" style="display: none;">
+          <p>
+            A dataset is being built just for you. This task can take up to 30 seconds. Please be patient.
+            In the meantime you can play with views, when the data will be ready it will be automatically set.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="alert alert-info API-GDELT-REQUIRED" role="alert" data-required="false">
+        Some more advanced functionalities regarding live querying the GDELT database
+        have been disabled since the server that is currently used doesn't support this feature.
+        You can still explore with the provided datasets.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+    </div>
+  </div>
+<script type="text/javascript" src="vendor.564a539d5186fca5bba4.js"></script><script type="text/javascript" src="bundle.4d5a84d69fa11976b9ee.js"></script></body>
+
+</html>
