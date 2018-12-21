@@ -6,6 +6,7 @@ import Dashboard from "./views/dashboard/Dashboard";
 import Story from "./Story";
 import "../assets/styles/index.scss";
 import "bootstrap/dist/css/bootstrap.min.css";
+import WebFont from "webfontloader";
 
 /**
  * Class the manages all the app
@@ -21,6 +22,12 @@ class App {
    * @memberof App
    */
   init() {
+    WebFont.load({
+      google: {
+        families: ["Special Elite"]
+      }
+    });
+
     let p = document.createElement("p");
     const pId = "fetchApi-p";
     p.innerText = "API is waking up, please be patient.";
